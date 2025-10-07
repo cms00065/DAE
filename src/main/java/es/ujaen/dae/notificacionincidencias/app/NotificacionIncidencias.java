@@ -1,13 +1,13 @@
-package es.ujaen.dae.notificacionincidencias;
+package es.ujaen.dae.notificacionincidencias.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class NotificacionincidenciasApplication {
+public class NotificacionIncidencias {
 
     public static void main(String[] args) {
-        SpringApplication.run(NotificacionincidenciasApplication.class, args);
+        SpringApplication.run(NotificacionIncidencias.class, args);
     }
 
 }
