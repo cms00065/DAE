@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
+/**
+ * @author gcg00035
+ */
 @Entity
 public class Usuario {
     @Id
@@ -96,4 +99,13 @@ public class Usuario {
     public Rol rol() {
         return rol;
     }
+
+    public boolean verificarClave(String clave) {
+        return clave.equals(hashClave);
+    }
+
+    public void cambiarClave(String clave) {
+        hashClave = clave;
+    }
+
 }
