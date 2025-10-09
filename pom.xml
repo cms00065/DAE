@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>es.ujaen.dae</groupId>
-    <artifactId>notificacionincidencias</artifactId>
+    <artifactId>NotificacionIncidencias</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>notificacionincidencias</name>
-    <description>notificacionincidencias</description>
+    <name>NotificacionIncidencias</name>
+    <description>NotificacionIncidencias</description>
     <url/>
     <licenses>
         <license/>
@@ -41,8 +41,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
 
         <dependency>
