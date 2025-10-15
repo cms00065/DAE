@@ -1,19 +1,15 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 /**
  * @author gcg00035
  */
-@Entity
 public class Usuario {
-    @Id
+
     @Positive
     int id;
 
@@ -24,7 +20,7 @@ public class Usuario {
 
     LocalDate fechaNacimiento;
 
-    @Embedded
+    @NotNull
     Direccion direccion;
 
     @Pattern(

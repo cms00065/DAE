@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * Representa una dirección postal embebida en Usuario.
  */
-@Embeddable
+
 public class Direccion {
 
     @NotBlank(message = "La vía no puede estar vacía")

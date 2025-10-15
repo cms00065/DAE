@@ -7,9 +7,8 @@ import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
 
-@Entity
+
 public class TipoIncidencia {
-    @Id
     @Positive
     int id;
 
