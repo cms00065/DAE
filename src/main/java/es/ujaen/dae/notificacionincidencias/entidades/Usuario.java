@@ -10,7 +10,7 @@ import java.time.LocalDate;
  */
 public class Usuario {
 
-    @Positive
+
     int id;
 
     @NotBlank
@@ -38,7 +38,7 @@ public class Usuario {
     @NotBlank(message = "La clave no puede estar vacía")
     String hashClave;
 
-    @Enumerated(EnumType.STRING)
+    @NotNull
     Rol rol;
 
     public Usuario() {
@@ -94,6 +94,10 @@ public class Usuario {
 
     public Rol rol() {
         return rol;
+    }
+
+    public void direccion(Direccion direccion) {
+        this.direccion = direccion;
     }
 
     public boolean verificarClave(String clave) {
