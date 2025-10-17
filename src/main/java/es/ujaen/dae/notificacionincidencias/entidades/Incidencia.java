@@ -3,13 +3,14 @@ package es.ujaen.dae.notificacionincidencias.entidades;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+/**
+ * @author jma00081
+ */
 public class Incidencia {
     @Positive
     int id;
@@ -87,5 +88,69 @@ public class Incidencia {
     public void cambiarEstado(EstadoIncidencia nuevoEstado) {
         this.estado = nuevoEstado;
         this.fechaUltimaActualizacion = LocalDate.now();
+    }
+
+    /**
+     * Establece el id de la incidencia
+     * @param id
+     */
+    public void id(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Establece la fecha de la incidencia
+     * @param fecha
+     */
+    public void fecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
+
+    /**
+     * Establece la fecha de la última actualización de la incidencia
+     * @param fechaUltimaActualizacion
+     */
+    public void fechaUltimaActualizacion(LocalDate fechaUltimaActualizacion) {
+        this.fechaUltimaActualizacion = fechaUltimaActualizacion;
+    }
+
+    /**
+     * Establece la descripción de la incidencia
+     * @param descripcion
+     */
+    public void descripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    /**
+     * Establece la localización de la incidencia
+     * @param localizacion
+     */
+    public void localizacion(String localizacion) {
+        this.localizacion = localizacion;
+    }
+
+    /**
+     * Establece el estado de la incidencia
+     * @param estado
+     */
+    public void estado(EstadoIncidencia estado) {
+        this.estado = estado;
+    }
+
+    /**
+     * Establece la ubicación GPS de la incidencia
+     * @param ubicacionGPS
+     */
+    public void ubicacionGPS(CoordenadasGPS ubicacionGPS) {
+        this.ubicacionGPS = ubicacionGPS;
+    }
+
+    /**
+     * Establece el tipo de la incidencia
+     * @param tipo
+     */
+    public void tipo(TipoIncidencia tipo) {
+        this.tipo = tipo;
     }
 }

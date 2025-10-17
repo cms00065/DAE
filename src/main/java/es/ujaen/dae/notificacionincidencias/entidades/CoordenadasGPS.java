@@ -2,6 +2,9 @@ package es.ujaen.dae.notificacionincidencias.entidades;
 
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * @author jma00081
+ */
 public class CoordenadasGPS {
     @NotBlank
     double lat;
