@@ -165,7 +165,6 @@ public class Incidencia {
     public void tipo(TipoIncidencia tipo) {
         this.tipo = tipo;
     }
-}
 
     /**
      * Indica si el usuario tiene permiso para borrar la incidencia
@@ -185,4 +184,5 @@ public class Incidencia {
         this.estado = nuevoEstado;
         this.fechaUltimaActualizacion = LocalDate.now();
     }
+}
 
