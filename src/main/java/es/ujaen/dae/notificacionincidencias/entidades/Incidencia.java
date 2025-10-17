@@ -46,48 +46,60 @@ public class Incidencia {
         this.fechaUltimaActualizacion = fechaUltimaActualizacion;
     }
 
-
+    /**
+     * Obtiene el id de la incidencia
+     * @return el id
+     */
     public int id() {
         return id;
     }
 
+    /**
+     * Obtiene la fecha de la incidencia
+     * @return la fecha
+     */
     public LocalDate fecha() {
         return fecha;
     }
 
+    /**
+     * Obtiene la descripción de la incidencia
+     * @return la descripción
+     */
     public String descripcion() {
         return descripcion;
     }
 
+    /**
+     * Obtiene la localización de la incidencia
+     * @return la localización
+     */
     public String localizacion() {
         return localizacion;
     }
 
+    /**
+     * Obtiene la ubicación GPS de la incidencia
+     * @return la ubicación GPS
+     */
     public EstadoIncidencia estado() {
         return estado;
     }
 
+    /**
+     * Obtiene la ubicación GPS de la incidencia
+     * @return la ubicación GPS
+     */
     public LocalDate fechaUltimaActualizacion() {
         return fechaUltimaActualizacion;
     }
 
     /**
-     * Indica si el usuario tiene permiso para borrar la incidencia
-     * Solo los usuarios con rol ADMIN pueden borrar la incidencia
-     * @param usuario Usuario que solicita el borrado
-     * @return true si el usuario es ADMIN, false en caso contrario
+     * Obtiene la ubicación GPS de la incidencia
+     * @return la ubicación GPS
      */
-    public boolean puedeBorrar(Usuario usuario) {
-        return usuario.rol() == Rol.ADMIN;
-    }
-
-    /**
-     * Cambia el estado de la incidencia y actualiza la fecha de la última modificación
-     * @param nuevoEstado Nuevo estado que se asignará a la incidencia
-     */
-    public void cambiarEstado(EstadoIncidencia nuevoEstado) {
-        this.estado = nuevoEstado;
-        this.fechaUltimaActualizacion = LocalDate.now();
+    public TipoIncidencia tipo() {
+        return tipo;
     }
 
     /**
@@ -154,3 +166,23 @@ public class Incidencia {
         this.tipo = tipo;
     }
 }
+
+    /**
+     * Indica si el usuario tiene permiso para borrar la incidencia
+     * Solo los usuarios con rol ADMIN pueden borrar la incidencia
+     * @param usuario Usuario que solicita el borrado
+     * @return true si el usuario es ADMIN, false en caso contrario
+     */
+    public boolean puedeBorrar(Usuario usuario) {
+        return usuario.rol() == Rol.ADMIN;
+    }
+
+    /**
+     * Cambia el estado de la incidencia y actualiza la fecha de la última modificación
+     * @param nuevoEstado Nuevo estado que se asignará a la incidencia
+     */
+    public void cambiarEstado(EstadoIncidencia nuevoEstado) {
+        this.estado = nuevoEstado;
+        this.fechaUltimaActualizacion = LocalDate.now();
+    }
+
