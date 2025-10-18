@@ -35,15 +35,15 @@ public class Incidencia {
 
     public Incidencia() {}
 
-
-    public Incidencia(int id, LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado,
-                      LocalDate fechaUltimaActualizacion) {
+    public Incidencia(int id, LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo) {
         this.id = id;
         this.fecha = fecha;
+        this.fechaUltimaActualizacion = fecha;
         this.descripcion = descripcion;
         this.localizacion = localizacion;
         this.estado = estado;
-        this.fechaUltimaActualizacion = fechaUltimaActualizacion;
+        this.ubicacionGPS = ubicacionGPS;
+        this.tipo = tipo;
     }
 
     /**
