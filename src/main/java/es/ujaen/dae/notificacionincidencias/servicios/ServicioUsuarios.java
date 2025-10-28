@@ -4,12 +4,13 @@ import es.ujaen.dae.notificacionincidencias.entidades.Direccion;
 import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoDisponible;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioYaRegistrado;
+import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioUsuarios;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -18,51 +19,64 @@ import java.util.Optional;
 @Service
 @Validated
 public class ServicioUsuarios {
-    Map<String, Usuario> usuariosRegistrados;
+    @Autowired
+    RepositorioUsuarios usuariosRegistrados;
 
     public ServicioUsuarios() {
-        usuariosRegistrados = new HashMap<>();
+
     }
 
     public void registrarUsuario(@Valid Usuario nuevoUsuario) {
 
-        if (usuariosRegistrados.containsKey(nuevoUsuario.email())) {
+        Optional<Usuario> existente = usuariosRegistrados.buscar(nuevoUsuario.email());
+        if (existente.isPresent()) {
             throw new UsuarioYaRegistrado();
         }
 
-        usuariosRegistrados.put(nuevoUsuario.email(), nuevoUsuario);
+        usuariosRegistrados.guardar(nuevoUsuario);
 
     }
 
     public Optional<Usuario> login(String email, String clave) {
-        Usuario usuario = usuariosRegistrados.get(email);
-        if (usuario == null) {
+        Optional<Usuario> usuarioOpt = usuariosRegistrados.buscar(email);
+        if (usuarioOpt.isEmpty()) {
             return Optional.empty();
         }
+
+        Usuario usuario = usuarioOpt.get();
+
         if (usuario.hashClave().equals(clave)) {
             return Optional.of(usuario);
         }
+
         return Optional.empty();
     }
 
+    @Transactional
     public void cambiarClave(String email, String claveAntigua, String claveNueva) {
-        Usuario usuario = usuariosRegistrados.get(email);
+        Optional<Usuario> usuario = usuariosRegistrados.buscar(email);
 
-        if (usuario != null && usuario.hashClave().equals(claveAntigua)) {
-            usuario.cambiarClave(claveNueva);
+        if (usuario.isEmpty()) {
+            throw new UsuarioNoDisponible();
         }
+
+        if (!usuario.get().hashClave().equals(claveAntigua)) {
+            throw new IllegalArgumentException("Contraseña antigua incorrecta");
+        }
+
+        usuario.get().cambiarClave(claveNueva);
     }
 
     public void actualizarPerfil(@Valid Direccion dir, String email) {
 
-    Usuario usuario = usuariosRegistrados.get(email);
+    Optional<Usuario> usuario = usuariosRegistrados.buscar(email);
 
-    if (usuario == null) {
+    if (usuario.isEmpty()) {
 
         throw new UsuarioNoDisponible();
     }
 
-    usuario.direccion(dir);
+    usuario.get().direccion(dir);
 
     }
 
