@@ -1,6 +1,7 @@
 package es.ujaen.dae.notificacionincidencias.servicios;
 
 import es.ujaen.dae.notificacionincidencias.entidades.*;
+import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoDisponible;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioYaRegistrado;
 import es.ujaen.dae.notificacionincidencias.servicios.ServicioUsuarios;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 
@@ -20,6 +22,7 @@ import java.time.LocalDate;
  */
 
 @SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class)
+@ActiveProfiles("test")
 public class TestServicioUsuarios {
 
     @Autowired
@@ -84,6 +87,11 @@ public class TestServicioUsuarios {
         assertThat(servicio.login("javig@gmail.com", "clave1234")).hasValueSatisfying(u -> u.email().equals(usuario.email()));
 
         servicio.cambiarClave("javig@gmail.com","clave1234","claveNueva");
+
+        //Cambio de clva con email incorrecto
+        assertThatThrownBy(() -> servicio.cambiarClave("noexiste@gmail.com", "clave1234", "claveNueva"))
+                .isInstanceOf(UsuarioNoDisponible.class); // si tienes esa excepción
+
 
         //Prueba de contraseña antigua
         assertThat(servicio.login("javig@gmail.com", "clave1234")).isEmpty();
