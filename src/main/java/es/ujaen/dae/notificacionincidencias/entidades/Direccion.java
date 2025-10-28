@@ -6,22 +6,22 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * Representa una dirección postal embebida en Usuario.
  */
-
+@Embeddable
 public class Direccion {
 
     @NotBlank(message = "La vía no puede estar vacía")
-    String via;
+    private String via;
 
     @NotBlank(message = "El número no puede estar vacío")
-    String numero;
+    private String numero;
 
-    String pisoPuerta;
+    private String pisoPuerta;
 
     @NotBlank(message = "La ciudad no puede estar vacía")
-    String ciudad;
+    private String ciudad;
 
     @NotBlank(message = "El código postal no puede estar vacío")
-    String cp;
+    private String cp;
 
     public Direccion() {
     }
