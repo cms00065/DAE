@@ -1,15 +1,21 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author cms00065
+ */
 
+@Entity
 public class TipoIncidencia {
     @Positive
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @NotBlank
