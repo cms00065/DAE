@@ -7,21 +7,24 @@ import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.excepciones.TipoIncidenciaEstaEnUso;
 import es.ujaen.dae.notificacionincidencias.excepciones.TipoIncidenciaYaExiste;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoEsAdmin;
+import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioTipoIncidencia;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * @author cms00065@red.ujaen.es
+ * @author cms00065
  */
 @Service
 public class ServicioTipoIncidencia {
-    Map<Integer, TipoIncidencia> tiposIncidencias;
+    @Autowired
+    RepositorioTipoIncidencia repositorioTipoIncidencia;
 
     public ServicioTipoIncidencia() {
-        tiposIncidencias = new HashMap<Integer, TipoIncidencia>();
+
     }
 
     /**
@@ -31,18 +34,18 @@ public class ServicioTipoIncidencia {
      * @param tipoNuevo Tipo de incidencia a registrar
      * @return El tipo de incidencia con su fecha de alta
      */
-    public TipoIncidencia alta(@Valid Usuario usuario, @Valid TipoIncidencia tipoNuevo){
-        if(usuario.rol() != Rol.ADMIN){
+    public TipoIncidencia alta(@Valid Usuario usuario, @Valid TipoIncidencia tipoNuevo) {
+        if (usuario.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
 
-        if(tiposIncidencias.containsKey(tipoNuevo.id())){
+        if (repositorioTipoIncidencia.buscarPorNombre(tipoNuevo.nombre())) {
             throw new TipoIncidenciaYaExiste();
         }
 
         tipoNuevo.isActivo(true);
         tipoNuevo.fechaAlta(LocalDateTime.now());
-        tiposIncidencias.put(tipoNuevo.id(), tipoNuevo);
+        repositorioTipoIncidencia.crear(tipoNuevo);
         return tipoNuevo;
     }
 
@@ -53,39 +56,33 @@ public class ServicioTipoIncidencia {
      * @param tipoId Identificador del tipo a eliminar
      * @param incidencias Lista de incidencias existentes para comprobar su uso
      */
-    public void baja(@Valid Usuario usuario, int tipoId, List<Incidencia> incidencias){
-        if(usuario.rol() != Rol.ADMIN){
+    public void baja(@Valid Usuario usuario, int tipoId, List<Incidencia> incidencias) {
+        if (usuario.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
 
+        //Busco la entidad gestionada
+        Optional<TipoIncidencia> tipo = repositorioTipoIncidencia.buscar(tipoId);
+
         boolean enUso = false;
-        for(Incidencia incidencia : incidencias){
-            if(incidencia.tipo().id() == tipoId && incidencia.estado() != null){
+        for (Incidencia incidencia : incidencias) {
+            if (incidencia.tipo().id() == tipoId && incidencia.estado() != null) {
                 enUso = true;
                 break;
             }
         }
 
         //Si el tipo de incidencia está en uso no puede eliminarse
-        if(enUso){
+        if (enUso) {
             throw new TipoIncidenciaEstaEnUso();
         }
 
-        TipoIncidencia tipo = tiposIncidencias.get(tipoId);
-        if (tipo != null) {
-            tipo.isActivo(false); //"Elimino" (marco como que no está activa) el tipo de incidencia correspondiente
-        }
-
+        tipo.get().isActivo(false); //"Elimino" (marco como que no está activa) el tipo de incidencia correspondiente
+        repositorioTipoIncidencia.actualizar(tipo.get());
     }
 
-    public List<TipoIncidencia> listarActivos(){
-        List<TipoIncidencia> tiposActivos = new ArrayList<TipoIncidencia>();
-        for (TipoIncidencia tipoIncidencia : tiposIncidencias.values()) {
-            if (tipoIncidencia.isActivo()) {
-                tiposActivos.add(tipoIncidencia);
-            }
-        }
-        return tiposActivos;
+    public List<TipoIncidencia> listarActivos() {
+        return repositorioTipoIncidencia.listarActivos();
     }
 
     /**
@@ -93,7 +90,7 @@ public class ServicioTipoIncidencia {
      * @param id identificador del tipo de incidencia
      * @return Devuelve el tipo de incidencia correspondiente o vacío si no existe
      */
-    public Optional<TipoIncidencia> buscarPorId(int id){
-        return Optional.ofNullable(tiposIncidencias.get(id));
+    public Optional<TipoIncidencia> buscarPorId(int id) {
+        return repositorioTipoIncidencia.buscar(id);
     }
 }
