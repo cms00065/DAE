@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Entity
 public class TipoIncidencia {
-    @Positive
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;

@@ -39,7 +39,7 @@ public class ServicioTipoIncidencia {
             throw new UsuarioNoEsAdmin();
         }
 
-        if (repositorioTipoIncidencia.buscarPorNombre(tipoNuevo.nombre())) {
+        if (repositorioTipoIncidencia.buscarPorNombre(tipoNuevo.nombre()).isPresent()) {
             throw new TipoIncidenciaYaExiste();
         }
 
@@ -77,7 +77,7 @@ public class ServicioTipoIncidencia {
             throw new TipoIncidenciaEstaEnUso();
         }
 
-        tipo.get().isActivo(false); //"Elimino" (marco como que no está activa) el tipo de incidencia correspondiente
+        tipo.get().isActivo(false); //"Elimino lógicamente" (marco como que no está activa) el tipo de incidencia correspondiente
         repositorioTipoIncidencia.actualizar(tipo.get());
     }
 
@@ -92,5 +92,14 @@ public class ServicioTipoIncidencia {
      */
     public Optional<TipoIncidencia> buscarPorId(int id) {
         return repositorioTipoIncidencia.buscar(id);
+    }
+
+    /**
+     * @brief Busca un tipo de incidencia por su nombre
+     * @param nombre Nombre del tipo de incidencia
+     * @return Devuelve el tipo de incidencia correspondiente o vacío si no existe
+     */
+    public Optional<TipoIncidencia> buscarPorNombre(String nombre) {
+        return repositorioTipoIncidencia.buscarPorNombre(nombre);
     }
 }
