@@ -26,10 +26,9 @@ public class RepositorioTipoIncidencia {
         return Optional.ofNullable(em.find(TipoIncidencia.class, id));
     }
 
-    public boolean buscarPorNombre(String nombre){
-        Long count = em.createQuery("SELECT COUNT(t) FROM TipoIncidencia t WHERE LOWER(t.nombre) = LOWER(:nombre) ", Long.class).setParameter("nombre", nombre).getSingleResult();
-
-        return count > 0;
+    public Optional<TipoIncidencia> buscarPorNombre(String nombre){
+        return em.createQuery("SELECT t FROM TipoIncidencia t WHERE LOWER(t.nombre) = LOWER(:nombre) ", TipoIncidencia.class).
+                setParameter("nombre", nombre).getResultStream().findFirst();
     }
 
     public void crear(TipoIncidencia tipoIncidencia){
