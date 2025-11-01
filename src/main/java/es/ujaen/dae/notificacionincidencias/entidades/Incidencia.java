@@ -11,8 +11,10 @@ import java.time.LocalDate;
 /**
  * @author jma00081
  */
+@Entity
 public class Incidencia {
-    @Positive
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     LocalDate fecha;
@@ -28,12 +30,15 @@ public class Incidencia {
     EstadoIncidencia estado;
 
     @NotNull
+    @Embedded
     CoordenadasGPS ubicacionGPS;
 
     @NotNull
+    @ManyToOne
     TipoIncidencia tipo;
 
     @NotNull
+    @ManyToOne
     Usuario creador;
 
     public Incidencia() {}

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * @author jma00081
  */
+@Embeddable
 public class CoordenadasGPS {
     @NotBlank
     double lat;
