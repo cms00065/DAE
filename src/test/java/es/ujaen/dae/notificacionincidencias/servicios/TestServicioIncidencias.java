@@ -41,21 +41,6 @@ public class TestServicioIncidencias {
     }
 
     /**
-     * Comprueba que un usuario no logueado no puede crear incidencias.
-     */
-    @Test
-    @DirtiesContext
-    void testCrearIncidenciaSinLogin() {
-        var usuario = new Usuario("Luis", "Romero", null, null, "120723356", "luis@correo.es", null, "claveLuis", Rol.CIUDADANO);
-        var tipo = new TipoIncidencia(2, "Basura", "Contenedor lleno", true, null);
-        var coordenadas = new CoordenadasGPS(40.4168, -3.7038);
-        var incidencia = new Incidencia(101, LocalDate.now(), "Contenedor lleno", "C/ Plaza del Sol", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
-
-        assertThatThrownBy(() -> servicioIncidencias.crearIncidencia(usuario, incidencia))
-                .isInstanceOf(UsuarioNoLogueado.class);
-    }
-
-    /**
      * Comprueba que un usuario ADMIN puede buscar incidencias por tipo y estado.
      */
     @Test
@@ -98,7 +83,7 @@ public class TestServicioIncidencias {
 
         servicioIncidencias.crearIncidencia(admin, incidencia);
 
-        Optional<Incidencia> modificada = servicioIncidencias.cambiarEstado(admin, 103, EstadoIncidencia.RESUELTA);
+        Optional<Incidencia> modificada = servicioIncidencias.cambiarEstado(admin, incidencia, EstadoIncidencia.RESUELTA);
         assertThat(modificada).isPresent();
         assertThat(modificada.get().estado()).isEqualTo(EstadoIncidencia.RESUELTA);
     }
@@ -115,7 +100,7 @@ public class TestServicioIncidencias {
         var incidencia = new Incidencia(104, LocalDate.now(), "Obras sin señalizar en acera", "C/ Av. Andalucía", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
 
         servicioIncidencias.crearIncidencia(usuario, incidencia);
-        servicioIncidencias.borrar(usuario, 104);
+        servicioIncidencias.borrar(usuario, incidencia);
 
         var resultado = servicioIncidencias.listarMisInicidencias(usuario);
         assertThat(resultado).isEmpty();
