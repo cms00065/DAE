@@ -1,5 +1,6 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
+import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 
 /**

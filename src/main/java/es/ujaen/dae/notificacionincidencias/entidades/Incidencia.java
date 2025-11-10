@@ -1,8 +1,6 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,36 +13,35 @@ import java.time.LocalDate;
 public class Incidencia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
-    LocalDate fecha;
-    LocalDate fechaUltimaActualizacion;
+    private LocalDate fecha;
+    private LocalDate fechaUltimaActualizacion;
 
     @NotBlank (message = "La descripción no puede estar vacía")
-    String descripcion;
+    private String descripcion;
 
     @Pattern(regexp = "^C/\\s.+$", message = "La localización debe empezar por 'C/ ' seguido del nombre de la calle")
-    String localizacion;
+    private String localizacion;
 
     @Enumerated
-    EstadoIncidencia estado;
+    private EstadoIncidencia estado;
 
     @NotNull
     @Embedded
-    CoordenadasGPS ubicacionGPS;
+    private CoordenadasGPS ubicacionGPS;
 
     @NotNull
     @ManyToOne
-    TipoIncidencia tipo;
+    private TipoIncidencia tipo;
 
     @NotNull
     @ManyToOne
-    Usuario creador;
+    private Usuario creador;
 
     public Incidencia() {}
 
-    public Incidencia(int id, LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {
-        this.id = id;
+    public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {
         this.fecha = fecha;
         this.fechaUltimaActualizacion = fecha;
         this.descripcion = descripcion;
@@ -130,7 +127,7 @@ public class Incidencia {
      * @return true si el usuario es ADMIN, false en caso contrario
      */
     public boolean puedeBorrar(Usuario usuario) {
-        return (usuario.rol() == Rol.ADMIN) || (usuario.id() == this.creador.id());
+        return (usuario.rol() == Rol.ADMIN) || (usuario.id() == this.creador.id() && estado == EstadoIncidencia.PENDIENTE);
     }
 
     /**
