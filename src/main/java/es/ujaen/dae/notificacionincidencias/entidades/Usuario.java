@@ -100,16 +100,46 @@ public class Usuario {
         return rol;
     }
 
-    public void direccion(Direccion direccion) {
-        this.direccion = direccion;
-    }
-
     public boolean verificarClave(String clave) {
         return clave.equals(hashClave);
     }
 
     public void cambiarClave(String clave) {
         hashClave = clave;
+    }
+
+    // -- SETTERS --
+
+    public void nombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void apellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public void fechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public void direccion(Direccion direccion) {
+        this.direccion = direccion;
+    }
+
+    public void telefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public void email(String email) {
+        this.email = email;
+    }
+
+    public void login(String login) {
+        this.login = login;
+    }
+
+    public void rol(Rol rol) {
+        this.rol = rol;
     }
 
 }

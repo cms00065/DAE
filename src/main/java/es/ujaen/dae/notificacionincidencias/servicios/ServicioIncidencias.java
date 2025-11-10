@@ -27,8 +27,6 @@ public class ServicioIncidencias {
 
     EstadoIncidencia filtroEstado;
 
-    //Usuario usuarioActual;
-
     public ServicioIncidencias() {
         tiposIncidencia = new HashMap<>();
         incidenciasCreadas = new HashMap<>();
@@ -43,11 +41,6 @@ public class ServicioIncidencias {
      * @param nuevaIncidencia La incidencia a crear
      */
     public void crearIncidencia(Usuario actor, @Valid Incidencia nuevaIncidencia) {
-        // Comprobar que el usuario que crea la incidencia ha iniciado sesión
-        if (actor.login() == null) {
-            throw new UsuarioNoLogueado();
-        }
-
         TipoIncidencia tipo = nuevaIncidencia.tipo();
         incidenciasCreadas.put(nuevaIncidencia.id(), nuevaIncidencia);
         tiposIncidencia.put(tipo.id(), tipo);
@@ -61,10 +54,6 @@ public class ServicioIncidencias {
      * @return La lista de incidencias creadas por el usuario
      */
     public List<Incidencia> listarMisInicidencias(Usuario actor) {
-        if (actor.login() == null) {
-            throw new UsuarioNoLogueado();
-        }
-
         return incidenciasPorUsuario.getOrDefault(actor.id(), List.of());
     }
 
@@ -78,10 +67,6 @@ public class ServicioIncidencias {
      * @return La lista de incidencias que cumplen los filtros
      */
     public List<Incidencia> buscar(Usuario actor, @PositiveOrZero int tipoId, EstadoIncidencia estado) {
-        if (actor.login() == null) {
-            throw new UsuarioNoLogueado();
-        }
-
         if (actor.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
@@ -96,16 +81,11 @@ public class ServicioIncidencias {
      * Borra una incidencia si el usuario actor tiene permiso para hacerlo
      * @param actor El usuario que solicita el borrado
      * @throws UsuarioNoLogueado Si el usuario no ha iniciado sesión
-     * @param incidenciaId El id de la incidencia a borrar
+     * @param incidencia La incidencia a borrar
      */
-    public void borrar(Usuario actor, @Positive int incidenciaId) {
-        if (actor.login() == null) {
-            throw new UsuarioNoLogueado();
-        }
-
-        Incidencia incidencia = incidenciasCreadas.get(incidenciaId);
+    public void borrar(Usuario actor, @Valid Incidencia incidencia) {
         if (incidencia != null && incidencia.puedeBorrar(actor)) {
-            incidenciasCreadas.remove(incidenciaId);
+            incidenciasCreadas.remove(incidencia.id());
             incidenciasPorUsuario.getOrDefault(actor.id(), List.of()).remove(incidencia);
         }
     }
@@ -115,20 +95,15 @@ public class ServicioIncidencias {
      * @param actor El usuario que solicita el cambio de estado
      * @throws UsuarioNoLogueado Si el usuario no ha iniciado sesión
      * @throws UsuarioNoEsAdmin Si el usuario no es ADMIN
-     * @param incidenciaId El id de la incidencia a modificar
+     * @param incidencia La incidencia a modificar
      * @param nuevoEstado El nuevo estado que se asignará a la incidencia
      * @return La incidencia modificada, o un Optional vacío si no se encontró la incidencia
      */
-    public Optional<Incidencia> cambiarEstado(Usuario actor, @Positive int incidenciaId, EstadoIncidencia nuevoEstado) {
-        if (actor.login() == null) {
-            throw new UsuarioNoLogueado();
-        }
-
+    public Optional<Incidencia> cambiarEstado(Usuario actor, @Valid Incidencia incidencia, EstadoIncidencia nuevoEstado) {
         if (actor.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
 
-        Incidencia incidencia = incidenciasCreadas.get(incidenciaId);
         if (incidencia != null) {
             incidencia.cambiarEstado(nuevoEstado);
         }
