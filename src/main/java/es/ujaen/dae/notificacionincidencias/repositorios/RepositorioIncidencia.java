@@ -1,5 +1,6 @@
 package es.ujaen.dae.notificacionincidencias.repositorios;
 
+import es.ujaen.dae.notificacionincidencias.entidades.EstadoIncidencia;
 import es.ujaen.dae.notificacionincidencias.entidades.Incidencia;
 import es.ujaen.dae.notificacionincidencias.entidades.TipoIncidencia;
 import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
@@ -29,7 +30,7 @@ public class RepositorioIncidencia {
         return Optional.ofNullable(em.find(Incidencia.class, id));
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public List<Incidencia> buscarPorFechaCreacion(LocalDate fecha) {
         return em.createQuery("SELECT i FROM Incidencia i WHERE i.fecha = :fechaBuscada", Incidencia.class)
                 .setParameter("fechaBuscada", fecha)
@@ -41,7 +42,7 @@ public class RepositorioIncidencia {
         return em.createQuery("SELECT i FROM Incidencia i WHERE i.fecha = :fechaBuscada", Incidencia.class)
                 .setParameter("fechaBuscada", fecha)
                 .getResultList();
-    }
+    }*/
 
     @Transactional(readOnly = true)
     public List<Incidencia> buscarPorTipo(TipoIncidencia tipo) {
@@ -49,6 +50,13 @@ public class RepositorioIncidencia {
                 .setParameter("tipoBuscado", tipo)
                 .getResultList();
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<Incidencia> buscarPorEstado(EstadoIncidencia estado) {
+        return em.createQuery("SELECT i FROM Incidencia i WHERE i.estado = :estadoBuscado", Incidencia.class)
+                .setParameter("estadoBuscado", estado)
+                .getResultList();
     }
 
     @Transactional(readOnly = true)
@@ -60,19 +68,23 @@ public class RepositorioIncidencia {
 
     @Transactional
     public void eliminar(Incidencia incidencia) {
-        em.remove(incidencia);
+        Incidencia gestionada = em.merge(incidencia);
+        em.remove(gestionada);
     }
 
     @Transactional
-    public Incidencia actualizar(Incidencia incidencia) {
-        return em.merge(incidencia);
+    public void actualizarEstado(Incidencia incidencia, EstadoIncidencia nuevoEstado) {
+        incidencia.cambiarEstado(nuevoEstado);
+        Incidencia gestionada = em.merge(incidencia);
+        //gestionada.cambiarEstado(nuevoEstado);
+        //em.persist(gestionada);
     }
 
     @Transactional
     public void guardar(Incidencia incidencia) {
-        if (em.find(Incidencia.class, id) != null) {
+        /*if (em.find(Incidencia.class, id).) {
             throw new IncidenciaYaCreada();
-        }
+        }*/
 
         em.persist(incidencia);
     }
