@@ -86,18 +86,44 @@ public class TestServicioUsuarios {
         //Login antes del cambio de contraseña
         assertThat(servicio.login("javig@gmail.com", "clave1234")).hasValueSatisfying(u -> u.email().equals(usuario.email()));
 
-        servicio.cambiarClave("javig@gmail.com","clave1234","claveNueva");
 
-        //Cambio de clva con email incorrecto
-        assertThatThrownBy(() -> servicio.cambiarClave("noexiste@gmail.com", "clave1234", "claveNueva"))
-                .isInstanceOf(UsuarioNoDisponible.class); // si tienes esa excepción
+        //Creo un nuevo usuario
 
+        // --- Crear usuarioNuevo con la nueva clave ---
+        var usuarioNuevo = new Usuario();
+        usuarioNuevo.nombre(usuario.nombre());
+        usuarioNuevo.apellidos(usuario.apellidos());
+        usuarioNuevo.direccion(usuario.direccion());
+        usuarioNuevo.telefono(usuario.telefono());
+        usuarioNuevo.email(usuario.email());
+        usuarioNuevo.login(usuario.login());
+        usuarioNuevo.rol(usuario.rol());
 
-        //Prueba de contraseña antigua
+        usuarioNuevo.cambiarClave("claveNueva");
+
+        // Hago la actualización en el servico
+        servicio.actualizarPerfil(usuario, usuarioNuevo);
+
+        // Login con la contraseña antigua (debe fallar)
         assertThat(servicio.login("javig@gmail.com", "clave1234")).isEmpty();
 
-        //Prueba con la contraseña nueva
-        assertThat(servicio.login("javig@gmail.com", "claveNueva")).hasValueSatisfying(u -> u.email().equals(usuario.email()));
+        // Login con la nueva contraseña (debe funcionar)
+        assertThat(servicio.login("javig@gmail.com", "claveNueva"))
+                .hasValueSatisfying(u -> u.email().equals(usuario.email()));
+
+        // Intento de que un usuario "hacker" cambie obtenga las credenciales de otro usuario
+        var usuarioFalso = new Usuario();
+        usuarioFalso.nombre("Intruso");
+        usuarioFalso.apellidos("Hackerman");
+        usuarioFalso.direccion(direccion);
+        usuarioFalso.telefono("600000000");
+        usuarioFalso.email("noexiste@gmail.com");
+        usuarioFalso.login("intruso");
+        usuarioFalso.cambiarClave("claveNueva");
+        usuarioFalso.rol(Rol.CIUDADANO);
+
+        assertThatThrownBy(() -> servicio.actualizarPerfil(usuarioFalso, usuarioNuevo))
+                .isInstanceOf(SecurityException.class);
     }
 
 }

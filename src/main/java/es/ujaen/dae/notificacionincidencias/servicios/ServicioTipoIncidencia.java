@@ -34,7 +34,7 @@ public class ServicioTipoIncidencia {
      * @param tipoNuevo Tipo de incidencia a registrar
      * @return El tipo de incidencia con su fecha de alta
      */
-    public TipoIncidencia alta(@Valid Usuario usuario, @Valid TipoIncidencia tipoNuevo) {
+    public TipoIncidencia alta(Usuario usuario, @Valid TipoIncidencia tipoNuevo) {
         if (usuario.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
@@ -56,7 +56,7 @@ public class ServicioTipoIncidencia {
      * @param tipoId Identificador del tipo a eliminar
      * @param incidencias Lista de incidencias existentes para comprobar su uso
      */
-    public void baja(@Valid Usuario usuario, int tipoId, List<Incidencia> incidencias) {
+    public void baja(Usuario usuario, int tipoId, List<Incidencia> incidencias) {
         if (usuario.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
