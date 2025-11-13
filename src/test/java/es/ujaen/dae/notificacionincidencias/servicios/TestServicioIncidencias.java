@@ -2,7 +2,6 @@ package es.ujaen.dae.notificacionincidencias.servicios;
 
 import es.ujaen.dae.notificacionincidencias.entidades.*;
 import es.ujaen.dae.notificacionincidencias.excepciones.*;
-import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioIncidencia;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,12 +9,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 /**
  * @author jma00081

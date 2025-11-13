@@ -2,7 +2,6 @@ package es.ujaen.dae.notificacionincidencias.entidades;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -112,10 +111,6 @@ public class Incidencia {
         this.ubicacionGPS = ubicacionGPS;
     }
 
-    /**
-     * Establece el tipo de la incidencia
-     * @param tipo
-     */
     public void tipo(TipoIncidencia tipo) {
         this.tipo = tipo;
     }
@@ -123,8 +118,9 @@ public class Incidencia {
     /**
      * Indica si el usuario tiene permiso para borrar la incidencia
      * Solo los usuarios con rol ADMIN pueden borrar la incidencia
+     * Si un usuario no es ADMIN, solo puede borrar la incidencia si es el creador y la incidencia está en estado PENDIENTE
      * @param usuario Usuario que solicita el borrado
-     * @return true si el usuario es ADMIN, false en caso contrario
+     * @return true si el usuario cumple las condiciones, false en caso contrario
      */
     public boolean puedeBorrar(Usuario usuario) {
         return (usuario.rol() == Rol.ADMIN) || (usuario.id() == this.creador.id() && estado == EstadoIncidencia.PENDIENTE);
