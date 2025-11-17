@@ -8,38 +8,42 @@ import java.time.LocalDate;
 /**
  * @author gcg00035
  */
+@Entity
+@Table(name = "Usuario")
 public class Usuario {
-
-
-    int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     @NotBlank
-    String nombre;
+    private String nombre;
 
-    String apellidos;
+    private String apellidos;
 
-    LocalDate fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @NotNull
-    Direccion direccion;
+    @Embedded
+    private Direccion direccion;
 
     @Pattern(
             regexp = "^(\\+34|0034|34)?[6789]\\d{8}$",
             message = "No es un número de teléfono válido"
     )
-    String telefono;
+    private String telefono;
 
     @Email(message = "Debe ser un correo electrónico válido")
-    String email;
+    private String email;
 
     @NotBlank(message = "El login no puede estar vacío")
-    String login;
+    private String login;
 
     @NotBlank(message = "La clave no puede estar vacía")
-    String hashClave;
+    private String hashClave;
 
     @NotNull
-    Rol rol;
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
 
     public Usuario() {
     }
@@ -96,16 +100,46 @@ public class Usuario {
         return rol;
     }
 
-    public void direccion(Direccion direccion) {
-        this.direccion = direccion;
-    }
-
     public boolean verificarClave(String clave) {
         return clave.equals(hashClave);
     }
 
     public void cambiarClave(String clave) {
         hashClave = clave;
+    }
+
+    // -- SETTERS --
+
+    public void nombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void apellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public void fechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public void direccion(Direccion direccion) {
+        this.direccion = direccion;
+    }
+
+    public void telefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public void email(String email) {
+        this.email = email;
+    }
+
+    public void login(String login) {
+        this.login = login;
+    }
+
+    public void rol(Rol rol) {
+        this.rol = rol;
     }
 
 }

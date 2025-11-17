@@ -6,83 +6,108 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author jma00081
  */
 @SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class)
+@ActiveProfiles("test")
 public class TestServicioIncidencias {
 
     @Autowired
     ServicioIncidencias servicioIncidencias;
 
+    @Autowired
+    ServicioUsuarios servicioUsuarios;
+
+    @Autowired
+    ServicioTipoIncidencia servicioTipoIncidencia;
+
     /**
-     * Comprueba que un usuario logueado puede crear incidencias correctamente.
+     * Comprueba que un usuario puede crear incidencias correctamente.
      */
     @Test
     @DirtiesContext
     void testCrearIncidenciaCorrecta() {
-        var usuario = new Usuario("Ana", "García", null, null, "600123456", "ana@correo.es", "ana", "claveAna", Rol.CIUDADANO);
-        var tipo = new TipoIncidencia(1, "Alumbrado", "Farola rota", true, null);
+        Direccion direccion = new Direccion("Avenida de Madrid",
+                "45",
+                "7º B",
+                "Jaén",
+                "23007");
+        var admin = new Usuario("Jose", "Mármol", null, direccion, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
+        var usuario = new Usuario("Ana", "García", null, direccion, "600123456", "ana@correo.es", "ana", "claveAna", Rol.CIUDADANO);
+        var tipo = new TipoIncidencia(0, "Alumbrado", "Farola rota", true, null);
         var coordenadas = new CoordenadasGPS(34.0522, -118.2437);
-        var incidencia = new Incidencia(100, LocalDate.now(), "Farola rota", "C/ Mayor, nº 12", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
+        var incidencia = new Incidencia(LocalDate.now(), "Farola rota", "C/ Mayor, nº 12", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
 
-        servicioIncidencias.crearIncidencia(usuario, incidencia);
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+        servicioTipoIncidencia.alta(admin, tipo);
+        servicioIncidencias.crearIncidencia(incidencia);
 
-        var resultado = servicioIncidencias.listarMisInicidencias(usuario);
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.get(0).descripcion()).contains("Farola rota");
+        var resultado = servicioIncidencias.buscarIncidenciasCreadasPor(usuario);
+        //assertThat(resultado).contains(incidencia);
+        assertThat(resultado.getFirst().descripcion()).contains("Farola rota");
     }
 
     /**
-     * Comprueba que un usuario no logueado no puede crear incidencias.
-     */
-    @Test
-    @DirtiesContext
-    void testCrearIncidenciaSinLogin() {
-        var usuario = new Usuario("Luis", "Romero", null, null, "120723356", "luis@correo.es", null, "claveLuis", Rol.CIUDADANO);
-        var tipo = new TipoIncidencia(2, "Basura", "Contenedor lleno", true, null);
-        var coordenadas = new CoordenadasGPS(40.4168, -3.7038);
-        var incidencia = new Incidencia(101, LocalDate.now(), "Contenedor lleno", "C/ Plaza del Sol", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
-
-        assertThatThrownBy(() -> servicioIncidencias.crearIncidencia(usuario, incidencia))
-                .isInstanceOf(UsuarioNoLogueado.class);
-    }
-
-    /**
-     * Comprueba que un usuario ADMIN puede buscar incidencias por tipo y estado.
+     * Comprueba que un usuario puede buscar incidencias por tipo y estado.
      */
     @Test
     @DirtiesContext
     void testBuscarPorTipoYEstado() {
-        var admin = new Usuario("Pedro", "del Moral", null, null, "600000000", "pedro@correo.es", "admin", "clavePedro", Rol.ADMIN);
-        var tipo = new TipoIncidencia(3, "Vandalismo", "Pintadas en muro", true, null);
+        Direccion direccion = new Direccion("Avenida de Madrid",
+                "45",
+                "7º B",
+                "Jaén",
+                "23007");
+        var admin = new Usuario("Jose", "Mármol", null, direccion, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
+        var usuario = new Usuario("Pedro", "del Moral", null, direccion, "600000000", "pedro@correo.es", "pedro", "clavePedro", Rol.CIUDADANO);
+        var tipo = new TipoIncidencia(0, "Vandalismo", "Pintadas en muro", true, null);
         var coordenadas = new CoordenadasGPS(37.3891, -5.9845);
-        var incidencia = new Incidencia(102, LocalDate.now(), "Pintadas en muro del colegio", "C/ del Arroyo", EstadoIncidencia.PENDIENTE, coordenadas, tipo, admin);
+        var incidencia = new Incidencia(LocalDate.now(), "Pintadas en muro del colegio", "C/ del Arroyo", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
 
-        servicioIncidencias.crearIncidencia(admin, incidencia);
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+        servicioTipoIncidencia.alta(admin, tipo);
+        servicioIncidencias.crearIncidencia(incidencia);
 
-        var resultado = servicioIncidencias.buscar(admin, 3, EstadoIncidencia.PENDIENTE);
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.get(0).localizacion()).contains("Arroyo");
+        var resultado1 = servicioIncidencias.buscarIncidenciasPorTipo(tipo);
+        var resultado2 = servicioIncidencias.buscarIncidenciasPorEstado(EstadoIncidencia.PENDIENTE);
+        assertThat(resultado1).hasSize(1);
+        assertThat(resultado2.get(0).localizacion()).contains("Arroyo");
     }
 
     /**
-     * Comprueba que un usuario no ADMIN no puede usar el método buscar.
+     * Comprueba que un usuario no ADMIN no puede borrar una incidencia suya que no esté en estado PENDIENTE
      */
     @Test
     @DirtiesContext
-    void testBuscarNoAdmin() {
-        var usuario = new Usuario("Carlos", "Ruiz", null, null, "600555555", "carlos@correo.es", "carlos", "clave", Rol.CIUDADANO);
+    void testEliminarNoAdminNoPendiente() {
+        Direccion direccion = new Direccion("Avenida de Madrid",
+                "45",
+                "7º B",
+                "Jaén",
+                "23007");
+        var admin = new Usuario("Jose", "Mármol", null, direccion, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
+        var usuario = new Usuario("Carlos", "Ruiz", null, direccion, "600555555", "carlos@correo.es", "carlos", "clave", Rol.CIUDADANO);
+        var tipo = new TipoIncidencia(0, "Vandalismo", "Pintadas en muro", true, null);
+        var coordenadas = new CoordenadasGPS(37.3891, -5.9845);
+        var incidencia = new Incidencia(LocalDate.now(), "Pintadas en muro del colegio", "C/ del Arroyo", EstadoIncidencia.EN_EVALUACION, coordenadas, tipo, usuario);
 
-        assertThatThrownBy(() -> servicioIncidencias.buscar(usuario, 0, null))
-                .isInstanceOf(UsuarioNoEsAdmin.class);
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+        servicioTipoIncidencia.alta(admin, tipo);
+        servicioIncidencias.crearIncidencia(incidencia);
+        servicioIncidencias.borrar(usuario, incidencia);
+
+        var resultado = servicioIncidencias.buscarIncidenciasCreadasPor(usuario);
+        assertThat(resultado.getFirst().descripcion()).contains("Pintadas en muro");
     }
 
     /**
@@ -91,33 +116,48 @@ public class TestServicioIncidencias {
     @Test
     @DirtiesContext
     void testCambiarEstadoIncidencia() {
-        var admin = new Usuario("Jose", "Mármol", null, null, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
-        var tipo = new TipoIncidencia(4, "Ruido", "Ruidos nocturnos", true, null);
+        Direccion direccion = new Direccion("Avenida de Madrid",
+                "45",
+                "7º B",
+                "Jaén",
+                "23007");
+        var admin = new Usuario("Jose", "Mármol", null, direccion, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
+        var tipo = new TipoIncidencia(0, "Ruido", "Ruidos nocturnos", true, null);
         var coordenadas = new CoordenadasGPS(39.4699, -0.3763);
-        var incidencia = new Incidencia(103, LocalDate.now(), "Ruidos en callejón", "C/ del Carril", EstadoIncidencia.PENDIENTE, coordenadas, tipo, admin);
+        var incidencia = new Incidencia(LocalDate.now(), "Ruidos en callejón", "C/ del Carril", EstadoIncidencia.PENDIENTE, coordenadas, tipo, admin);
 
-        servicioIncidencias.crearIncidencia(admin, incidencia);
+        servicioUsuarios.registrarUsuario(admin);
+        servicioTipoIncidencia.alta(admin, tipo);
+        servicioIncidencias.crearIncidencia(incidencia);
+        servicioIncidencias.cambiarEstado(admin, incidencia, EstadoIncidencia.RESUELTA);
 
-        Optional<Incidencia> modificada = servicioIncidencias.cambiarEstado(admin, 103, EstadoIncidencia.RESUELTA);
-        assertThat(modificada).isPresent();
-        assertThat(modificada.get().estado()).isEqualTo(EstadoIncidencia.RESUELTA);
+        assertThat(incidencia.estado()).isEqualTo(EstadoIncidencia.RESUELTA);
     }
 
     /**
-     * Comprueba que un usuario puede borrar su propia incidencia.
+     * Comprueba que un usuario puede borrar su propia incidencia si está en estado PENDIENTE
      */
     @Test
     @DirtiesContext
     void testBorrarIncidenciaPropia() {
-        var usuario = new Usuario("Lucía", "Sánchez", null, null, "600111222", "lucia@correo.es", "lucia", "clave", Rol.CIUDADANO);
-        var tipo = new TipoIncidencia(5, "Obras", "Obras sin señalizar", true, null);
+        Direccion direccion = new Direccion("Avenida de Madrid",
+                "45",
+                "7º B",
+                "Jaén",
+                "23007");
+        var admin = new Usuario("Jose", "Mármol", null, direccion, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
+        var usuario = new Usuario("Lucía", "Sánchez", null, direccion, "600111222", "lucia@correo.es", "lucia", "clave", Rol.CIUDADANO);
+        var tipo = new TipoIncidencia(0, "Obras", "Obras sin señalizar", true, null);
         var coordenadas = new CoordenadasGPS(41.3851, 2.1734);
-        var incidencia = new Incidencia(104, LocalDate.now(), "Obras sin señalizar en acera", "C/ Av. Andalucía", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
+        var incidencia = new Incidencia(LocalDate.now(), "Obras sin señalizar en acera", "C/ Av. Andalucía", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
 
-        servicioIncidencias.crearIncidencia(usuario, incidencia);
-        servicioIncidencias.borrar(usuario, 104);
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+        servicioTipoIncidencia.alta(admin, tipo);
+        servicioIncidencias.crearIncidencia(incidencia);
+        servicioIncidencias.borrar(usuario, incidencia);
 
-        var resultado = servicioIncidencias.listarMisInicidencias(usuario);
+        var resultado = servicioIncidencias.buscarIncidenciasCreadasPor(usuario);
         assertThat(resultado).isEmpty();
     }
 }

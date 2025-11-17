@@ -1,6 +1,7 @@
 package es.ujaen.dae.notificacionincidencias.servicios;
 
 import es.ujaen.dae.notificacionincidencias.entidades.*;
+import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoDisponible;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioYaRegistrado;
 import es.ujaen.dae.notificacionincidencias.servicios.ServicioUsuarios;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 
@@ -20,6 +22,7 @@ import java.time.LocalDate;
  */
 
 @SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class)
+@ActiveProfiles("test")
 public class TestServicioUsuarios {
 
     @Autowired
@@ -83,13 +86,45 @@ public class TestServicioUsuarios {
         //Login antes del cambio de contraseña
         assertThat(servicio.login("javig@gmail.com", "clave1234")).hasValueSatisfying(u -> u.email().equals(usuario.email()));
 
-        servicio.cambiarClave("javig@gmail.com","clave1234","claveNueva");
+        var usuarioBD = servicio.login("javig@gmail.com", "clave1234").get();
+        //Creo un nuevo usuario
 
-        //Prueba de contraseña antigua
+        // --- Crear usuarioNuevo con la nueva clave ---
+        var usuarioNuevo = new Usuario();
+        usuarioNuevo.nombre(usuario.nombre());
+        usuarioNuevo.apellidos(usuario.apellidos());
+        usuarioNuevo.direccion(usuario.direccion());
+        usuarioNuevo.telefono(usuario.telefono());
+        usuarioNuevo.email(usuario.email());
+        usuarioNuevo.login(usuario.login());
+        usuarioNuevo.rol(usuario.rol());
+
+        usuarioNuevo.cambiarClave("claveNueva");
+
+
+        // Hago la actualización en el servico
+        servicio.actualizarPerfil(usuarioBD, usuarioNuevo);
+
+        // Login con la contraseña antigua (debe fallar)
         assertThat(servicio.login("javig@gmail.com", "clave1234")).isEmpty();
 
-        //Prueba con la contraseña nueva
-        assertThat(servicio.login("javig@gmail.com", "claveNueva")).hasValueSatisfying(u -> u.email().equals(usuario.email()));
+        // Login con la nueva contraseña (debe funcionar)
+        assertThat(servicio.login("javig@gmail.com", "claveNueva"))
+                .hasValueSatisfying(u -> u.email().equals(usuario.email()));
+
+        // Intento de que un usuario "hacker" cambie obtenga las credenciales de otro usuario
+        var usuarioFalso = new Usuario();
+        usuarioFalso.nombre("Intruso");
+        usuarioFalso.apellidos("Hackerman");
+        usuarioFalso.direccion(direccion);
+        usuarioFalso.telefono("600000000");
+        usuarioFalso.email("noexiste@gmail.com");
+        usuarioFalso.login("intruso");
+        usuarioFalso.cambiarClave("claveNueva");
+        usuarioFalso.rol(Rol.CIUDADANO);
+
+        assertThatThrownBy(() -> servicio.actualizarPerfil(usuarioFalso, usuarioNuevo))
+                .isInstanceOf(SecurityException.class);
     }
 
 }

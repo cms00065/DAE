@@ -1,45 +1,46 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 /**
  * @author jma00081
  */
+@Entity
 public class Incidencia {
-    @Positive
-    int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    LocalDate fecha;
-    LocalDate fechaUltimaActualizacion;
+    private LocalDate fecha;
+    private LocalDate fechaUltimaActualizacion;
 
     @NotBlank (message = "La descripción no puede estar vacía")
-    String descripcion;
+    private String descripcion;
 
     @Pattern(regexp = "^C/\\s.+$", message = "La localización debe empezar por 'C/ ' seguido del nombre de la calle")
-    String localizacion;
+    private String localizacion;
 
     @Enumerated
-    EstadoIncidencia estado;
+    private EstadoIncidencia estado;
 
     @NotNull
-    CoordenadasGPS ubicacionGPS;
+    @Embedded
+    private CoordenadasGPS ubicacionGPS;
 
     @NotNull
-    TipoIncidencia tipo;
+    @ManyToOne
+    private TipoIncidencia tipo;
 
     @NotNull
-    Usuario creador;
+    @ManyToOne
+    private Usuario creador;
 
     public Incidencia() {}
 
-    public Incidencia(int id, LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {
-        this.id = id;
+    public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {
         this.fecha = fecha;
         this.fechaUltimaActualizacion = fecha;
         this.descripcion = descripcion;
@@ -110,10 +111,6 @@ public class Incidencia {
         this.ubicacionGPS = ubicacionGPS;
     }
 
-    /**
-     * Establece el tipo de la incidencia
-     * @param tipo
-     */
     public void tipo(TipoIncidencia tipo) {
         this.tipo = tipo;
     }
@@ -121,11 +118,12 @@ public class Incidencia {
     /**
      * Indica si el usuario tiene permiso para borrar la incidencia
      * Solo los usuarios con rol ADMIN pueden borrar la incidencia
+     * Si un usuario no es ADMIN, solo puede borrar la incidencia si es el creador y la incidencia está en estado PENDIENTE
      * @param usuario Usuario que solicita el borrado
-     * @return true si el usuario es ADMIN, false en caso contrario
+     * @return true si el usuario cumple las condiciones, false en caso contrario
      */
     public boolean puedeBorrar(Usuario usuario) {
-        return (usuario.rol() == Rol.ADMIN) || (usuario.id() == this.creador.id());
+        return (usuario.rol() == Rol.ADMIN) || (usuario.id() == this.creador.id() && estado == EstadoIncidencia.PENDIENTE);
     }
 
     /**

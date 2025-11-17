@@ -4,12 +4,13 @@ import es.ujaen.dae.notificacionincidencias.entidades.Direccion;
 import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoDisponible;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioYaRegistrado;
+import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioUsuarios;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -18,52 +19,84 @@ import java.util.Optional;
 @Service
 @Validated
 public class ServicioUsuarios {
-    Map<String, Usuario> usuariosRegistrados;
+    @Autowired
+    RepositorioUsuarios usuariosRegistrados;
 
     public ServicioUsuarios() {
-        usuariosRegistrados = new HashMap<>();
+
     }
 
     public void registrarUsuario(@Valid Usuario nuevoUsuario) {
 
-        if (usuariosRegistrados.containsKey(nuevoUsuario.email())) {
+        Optional<Usuario> existente = usuariosRegistrados.buscar(nuevoUsuario.email());
+        if (existente.isPresent()) {
             throw new UsuarioYaRegistrado();
         }
 
-        usuariosRegistrados.put(nuevoUsuario.email(), nuevoUsuario);
+        usuariosRegistrados.guardar(nuevoUsuario);
 
     }
 
     public Optional<Usuario> login(String email, String clave) {
-        Usuario usuario = usuariosRegistrados.get(email);
-        if (usuario == null) {
+        Optional<Usuario> usuarioOpt = usuariosRegistrados.buscar(email);
+        if (usuarioOpt.isEmpty()) {
             return Optional.empty();
         }
+
+        Usuario usuario = usuarioOpt.get();
+
         if (usuario.hashClave().equals(clave)) {
             return Optional.of(usuario);
         }
+
         return Optional.empty();
     }
 
-    public void cambiarClave(String email, String claveAntigua, String claveNueva) {
-        Usuario usuario = usuariosRegistrados.get(email);
+    /**
+     * Actualiza los datos del usuario autenticado, incluyendo dirección, teléfono o clave.
+     *
+     * @param usuarioAntiguo usuario actualmente autenticado (ya persistido)
+     * @param usuarioNuevo datos nuevos que el usuario desea aplicar
+     */
+    public void actualizarPerfil(Usuario usuarioAntiguo, Usuario usuarioNuevo) {
+        //Verifico que el usuario autenticado existe en BD
+        var usuarioBDOpt = usuariosRegistrados.buscar(usuarioAntiguo.email());
 
-        if (usuario != null && usuario.hashClave().equals(claveAntigua)) {
-            usuario.cambiarClave(claveNueva);
+        if (usuarioBDOpt.isEmpty()) {
+            throw new SecurityException("Usuario no autenticado o inexistente");
         }
-    }
+        Usuario usuarioBD = usuarioBDOpt.get();
 
-    public void actualizarPerfil(@Valid Direccion dir, String email) {
+        if (!usuarioBD.email().equals(usuarioAntiguo.email())) {
+            throw new SecurityException("No se puede modificar otro usuario");
+        }
 
-    Usuario usuario = usuariosRegistrados.get(email);
+        // Actualización de datos básicos (solo si no son nulos)
+        if (usuarioNuevo.nombre() != null && !usuarioNuevo.nombre().isBlank()) {
+            usuarioAntiguo.nombre(usuarioNuevo.nombre());
+        }
 
-    if (usuario == null) {
+        if (usuarioNuevo.apellidos() != null) {
+            usuarioAntiguo.apellidos(usuarioNuevo.apellidos());
+        }
 
-        throw new UsuarioNoDisponible();
-    }
+        if (usuarioNuevo.direccion() != null) {
+            usuarioAntiguo.direccion(usuarioNuevo.direccion());
+        }
 
-    usuario.direccion(dir);
+        if (usuarioNuevo.telefono() != null) {
+            usuarioAntiguo.telefono(usuarioNuevo.telefono());
+        }
 
+        if (usuarioNuevo.fechaNacimiento() != null) {
+            usuarioAntiguo.fechaNacimiento(usuarioNuevo.fechaNacimiento());
+        }
+
+        // Cambio de contraseña, si el usuario ha proporcionado una nueva
+        if (usuarioNuevo.hashClave() != null && !usuarioNuevo.hashClave().isBlank()) {
+            usuarioAntiguo.cambiarClave(usuarioNuevo.hashClave());
+        }
+        usuariosRegistrados.actualizar(usuarioAntiguo);
     }
 
 }

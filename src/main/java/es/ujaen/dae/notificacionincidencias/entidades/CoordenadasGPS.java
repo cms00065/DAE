@@ -1,15 +1,17 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author jma00081
  */
+@Embeddable
 public class CoordenadasGPS {
-    @NotBlank
+    @NotNull
     double lat;
 
-    @NotBlank
+    @NotNull
     double lon;
 
     public CoordenadasGPS() {}
