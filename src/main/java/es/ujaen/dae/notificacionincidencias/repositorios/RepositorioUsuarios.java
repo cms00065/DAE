@@ -44,5 +44,9 @@ public class RepositorioUsuarios {
         em.persist(usuario);
     }
 
+    public void actualizar(Usuario usuario) {
+        em.merge(usuario);
+    }
+
 
 }
