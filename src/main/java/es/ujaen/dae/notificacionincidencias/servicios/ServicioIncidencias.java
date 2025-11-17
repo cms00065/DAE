@@ -24,34 +24,28 @@ public class ServicioIncidencias {
 
     }
 
-    @Transactional
     public void crearIncidencia(@Valid Incidencia nuevaIncidencia) {
         repositorioIncidencias.guardar(nuevaIncidencia);
     }
 
-    @Transactional
     public List<Incidencia> buscarIncidenciasCreadasPor(Usuario actor) {
         return repositorioIncidencias.buscarIncidenciasCreadasPor(actor);
     }
 
-    @Transactional
     public List<Incidencia> buscarIncidenciasPorTipo(TipoIncidencia tipo) {
         return repositorioIncidencias.buscarPorTipo(tipo);
     }
 
-    @Transactional
     public List<Incidencia> buscarIncidenciasPorEstado(EstadoIncidencia estado) {
         return repositorioIncidencias.buscarPorEstado(estado);
     }
 
-    @Transactional
     public void borrar(Usuario actor, Incidencia incidencia) {
         if (incidencia.puedeBorrar(actor)) {
             repositorioIncidencias.eliminar(incidencia);
         }
     }
 
-    @Transactional
     public void cambiarEstado(Usuario actor, Incidencia incidencia, EstadoIncidencia nuevoEstado) {
         if (actor.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();

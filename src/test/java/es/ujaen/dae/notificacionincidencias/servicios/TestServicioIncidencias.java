@@ -40,16 +40,14 @@ public class TestServicioIncidencias {
                 "Jaén",
                 "23007");
         var admin = new Usuario("Jose", "Mármol", null, direccion, "686547888", "admin@ayto.es", "admin", "claveJose", Rol.ADMIN);
-        servicioUsuarios.registrarUsuario(admin);
-
         var usuario = new Usuario("Ana", "García", null, direccion, "600123456", "ana@correo.es", "ana", "claveAna", Rol.CIUDADANO);
-        servicioUsuarios.registrarUsuario(usuario);
-
         var tipo = new TipoIncidencia(0, "Alumbrado", "Farola rota", true, null);
-        servicioTipoIncidencia.alta(admin, tipo);
-
         var coordenadas = new CoordenadasGPS(34.0522, -118.2437);
         var incidencia = new Incidencia(LocalDate.now(), "Farola rota", "C/ Mayor, nº 12", EstadoIncidencia.PENDIENTE, coordenadas, tipo, usuario);
+
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+        servicioTipoIncidencia.alta(admin, tipo);
         servicioIncidencias.crearIncidencia(incidencia);
 
         var resultado = servicioIncidencias.buscarIncidenciasCreadasPor(usuario);
