@@ -58,11 +58,16 @@ public class ServicioUsuarios {
      * @param usuarioAntiguo usuario actualmente autenticado (ya persistido)
      * @param usuarioNuevo datos nuevos que el usuario desea aplicar
      */
-    @Transactional
     public void actualizarPerfil(Usuario usuarioAntiguo, Usuario usuarioNuevo) {
+        //Verifico que el usuario autenticado existe en BD
+        var usuarioBDOpt = usuariosRegistrados.buscar(usuarioAntiguo.email());
 
-        // Evitar que un usuario modifique otro
-        if (usuarioAntiguo.id() != usuarioNuevo.id()) {
+        if (usuarioBDOpt.isEmpty()) {
+            throw new SecurityException("Usuario no autenticado o inexistente");
+        }
+        Usuario usuarioBD = usuarioBDOpt.get();
+
+        if (!usuarioBD.email().equals(usuarioAntiguo.email())) {
             throw new SecurityException("No se puede modificar otro usuario");
         }
 
@@ -87,16 +92,11 @@ public class ServicioUsuarios {
             usuarioAntiguo.fechaNacimiento(usuarioNuevo.fechaNacimiento());
         }
 
-        // ⚙️ Cambio de contraseña, si el usuario ha proporcionado una nueva
+        // Cambio de contraseña, si el usuario ha proporcionado una nueva
         if (usuarioNuevo.hashClave() != null && !usuarioNuevo.hashClave().isBlank()) {
-
-            // Compruebo que la contraseña antigua coincide
-            if (!usuarioAntiguo.verificarClave(usuarioNuevo.hashClave())) {
-                throw new IllegalArgumentException("Contraseña antigua incorrecta");
-            }
-
             usuarioAntiguo.cambiarClave(usuarioNuevo.hashClave());
         }
+        usuariosRegistrados.actualizar(usuarioAntiguo);
     }
 
 }

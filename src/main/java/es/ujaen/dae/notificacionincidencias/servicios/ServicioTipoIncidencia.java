@@ -5,6 +5,7 @@ import es.ujaen.dae.notificacionincidencias.entidades.Rol;
 import es.ujaen.dae.notificacionincidencias.entidades.TipoIncidencia;
 import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.excepciones.TipoIncidenciaEstaEnUso;
+import es.ujaen.dae.notificacionincidencias.excepciones.TipoIncidenciaNoExiste;
 import es.ujaen.dae.notificacionincidencias.excepciones.TipoIncidenciaYaExiste;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoEsAdmin;
 import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioTipoIncidencia;
@@ -62,7 +63,7 @@ public class ServicioTipoIncidencia {
         }
 
         //Busco la entidad gestionada
-        Optional<TipoIncidencia> tipo = repositorioTipoIncidencia.buscar(tipoId);
+        TipoIncidencia tipo = repositorioTipoIncidencia.buscar(tipoId).orElseThrow(TipoIncidenciaNoExiste::new);
 
         boolean enUso = false;
         for (Incidencia incidencia : incidencias) {
@@ -77,8 +78,8 @@ public class ServicioTipoIncidencia {
             throw new TipoIncidenciaEstaEnUso();
         }
 
-        tipo.get().isActivo(false); //"Elimino lógicamente" (marco como que no está activa) el tipo de incidencia correspondiente
-        repositorioTipoIncidencia.actualizar(tipo.get());
+        tipo.isActivo(false); //"Elimino lógicamente" (marco como que no está activa) el tipo de incidencia correspondiente
+        repositorioTipoIncidencia.actualizar(tipo);
     }
 
     public List<TipoIncidencia> listarActivos() {

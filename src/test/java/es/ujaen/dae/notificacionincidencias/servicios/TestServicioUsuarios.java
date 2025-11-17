@@ -86,7 +86,7 @@ public class TestServicioUsuarios {
         //Login antes del cambio de contraseña
         assertThat(servicio.login("javig@gmail.com", "clave1234")).hasValueSatisfying(u -> u.email().equals(usuario.email()));
 
-
+        var usuarioBD = servicio.login("javig@gmail.com", "clave1234").get();
         //Creo un nuevo usuario
 
         // --- Crear usuarioNuevo con la nueva clave ---
@@ -101,8 +101,9 @@ public class TestServicioUsuarios {
 
         usuarioNuevo.cambiarClave("claveNueva");
 
+
         // Hago la actualización en el servico
-        servicio.actualizarPerfil(usuario, usuarioNuevo);
+        servicio.actualizarPerfil(usuarioBD, usuarioNuevo);
 
         // Login con la contraseña antigua (debe fallar)
         assertThat(servicio.login("javig@gmail.com", "clave1234")).isEmpty();
