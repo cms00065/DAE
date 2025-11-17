@@ -48,18 +48,15 @@ public class RepositorioIncidencia {
                 .getResultList();
     }
 
-    @Transactional
     public void eliminar(Incidencia incidencia) {
         Incidencia gestionada = em.merge(incidencia);
         em.remove(gestionada);
     }
 
-    @Transactional
     public void actualizarEstado(Incidencia incidencia) {
         em.merge(incidencia);
     }
 
-    @Transactional
     public void guardar(Incidencia incidencia) {
         em.persist(incidencia);
     }
