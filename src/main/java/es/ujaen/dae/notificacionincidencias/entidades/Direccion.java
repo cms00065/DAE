@@ -34,7 +34,6 @@ public class Direccion {
         this.cp = cp;
     }
 
-    // Métodos tipo record, como en tus ejemplos anteriores
     public String via() {
         return via;
     }
