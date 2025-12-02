@@ -9,10 +9,7 @@ import es.ujaen.dae.notificacionincidencias.servicios.ServicioUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -57,6 +54,19 @@ public class ControladorUsuarios {
         } else {
             // En caso de fallo (email no encontrado o clave incorrecta)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 UNAUTHORIZED
+        }
+    }
+
+    @GetMapping("/usuario/{email}")
+    public ResponseEntity<dtoUsuario> obtenerUsuarioPorEmail(@PathVariable String email) {
+
+        Optional<Usuario> usuarioOptional = servicioUsuarios.buscarUsuario(email);
+
+        if (usuarioOptional.isPresent()) {
+            Usuario usuario = usuarioOptional.get();
+            return ResponseEntity.ok(mapeadorUsuario.dto(usuario));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 

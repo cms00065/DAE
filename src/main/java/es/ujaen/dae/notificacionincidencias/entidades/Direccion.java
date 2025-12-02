@@ -1,5 +1,7 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 
@@ -26,6 +28,7 @@ public class Direccion {
     public Direccion() {
     }
 
+    @JsonCreator
     public Direccion(String via, String numero, String pisoPuerta, String ciudad, String cp) {
         this.via = via;
         this.numero = numero;
@@ -34,23 +37,23 @@ public class Direccion {
         this.cp = cp;
     }
 
-    public String via() {
+    public String getVia() {
         return via;
     }
 
-    public String numero() {
+    public String getNumero() {
         return numero;
     }
 
-    public String pisoPuerta() {
+    public String getPisoPuerta() {
         return pisoPuerta;
     }
 
-    public String ciudad() {
+    public String getCiudad() {
         return ciudad;
     }
 
-    public String cp() {
+    public String getCcp() {
         return cp;
     }
 }
