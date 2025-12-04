@@ -28,6 +28,10 @@ public class ServicioIncidencias {
         repositorioIncidencias.guardar(nuevaIncidencia);
     }
 
+    public Optional<Incidencia> buscarIncidencia(int id) {
+        return repositorioIncidencias.buscarPorId(id);
+    }
+
     public List<Incidencia> buscarIncidenciasCreadasPor(Usuario actor) {
         return repositorioIncidencias.buscarIncidenciasCreadasPor(actor);
     }
