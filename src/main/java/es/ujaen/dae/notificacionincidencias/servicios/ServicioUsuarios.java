@@ -22,8 +22,8 @@ public class ServicioUsuarios {
     @Autowired
     RepositorioUsuarios usuariosRegistrados;
 
-    public ServicioUsuarios() {
-
+    public Optional<Usuario> buscarUsuario(String email) {
+        return usuariosRegistrados.buscar(email);
     }
 
     public void registrarUsuario(@Valid Usuario nuevoUsuario) {
@@ -36,6 +36,13 @@ public class ServicioUsuarios {
         usuariosRegistrados.guardar(nuevoUsuario);
 
     }
+
+    public void buscarUsuario(@Valid Usuario nuevoUsuario) {
+
+
+
+    }
+
 
     public Optional<Usuario> login(String email, String clave) {
         Optional<Usuario> usuarioOpt = usuariosRegistrados.buscar(email);
