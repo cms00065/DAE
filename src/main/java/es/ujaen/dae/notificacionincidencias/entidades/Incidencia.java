@@ -75,6 +75,8 @@ public class Incidencia {
         return fechaUltimaActualizacion;
     }
 
+    public CoordenadasGPS ubicacionGPS() {return ubicacionGPS;}
+
     public TipoIncidencia tipo() {
         return tipo;
     }
