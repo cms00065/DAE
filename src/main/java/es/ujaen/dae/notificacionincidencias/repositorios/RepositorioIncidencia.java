@@ -47,6 +47,11 @@ public class RepositorioIncidencia {
                 .setParameter("usuario", creador)
                 .getResultList();
     }
+    
+    @Transactional(readOnly = true)
+    public List<Incidencia> listarTodas(){
+        return em.createQuery("SELECT i FROM Incidencia i", Incidencia.class).getResultList();
+    }
 
     public void eliminar(Incidencia incidencia) {
         Incidencia gestionada = em.merge(incidencia);

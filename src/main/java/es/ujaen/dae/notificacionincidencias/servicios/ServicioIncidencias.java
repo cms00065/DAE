@@ -50,6 +50,10 @@ public class ServicioIncidencias {
         }
     }
 
+    public List<Incidencia> listarTodas(){
+        return repositorioIncidencias.listarTodas();
+    }
+
     public void cambiarEstado(Usuario actor, Incidencia incidencia, EstadoIncidencia nuevoEstado) {
         if (actor.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
