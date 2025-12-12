@@ -17,8 +17,8 @@ public record dtoIncidencia(int id,
                             String localizacion,
                             EstadoIncidencia estado,
                             CoordenadasGPS ubicacionGPS,
-                            TipoIncidencia tipo,
-                            Usuario creador) {
+                            String IDtipoIncidencia,
+                            String IDcreador) {
 
 
 }

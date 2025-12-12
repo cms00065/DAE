@@ -57,9 +57,9 @@ public class ControladorIncidencias {
 
     }
 
-    @PostMapping("/incidencias/{id}/actualizarEstado")
+    @PostMapping("/incidencias/{id}/actualizarEstado/{nuevoEstado}")
     public ResponseEntity<dtoIncidencia> actualizarEstado(@PathVariable int id,
-                                                          @RequestBody EstadoIncidencia nuevoEstado,
+                                                          @PathVariable EstadoIncidencia nuevoEstado,
                                                           @RequestBody dtoUsuario dUsuario) {
         try {
             Optional<Incidencia> optionalIncidencia = servicio.buscarIncidencia(id);
@@ -70,8 +70,6 @@ public class ControladorIncidencias {
                 servicio.cambiarEstado(usuario, incidencia, nuevoEstado);
                 dtoIncidencia dto = mapeador.dto(incidencia);
                 return ResponseEntity.ok(dto);
-            } else {
-                throw new IncidenciaNoDisponible();
             }
         } catch (IncidenciaNoDisponible e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -79,5 +77,6 @@ public class ControladorIncidencias {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 }

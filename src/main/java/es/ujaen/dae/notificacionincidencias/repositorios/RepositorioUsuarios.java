@@ -1,5 +1,6 @@
 package es.ujaen.dae.notificacionincidencias.repositorios;
 
+import es.ujaen.dae.notificacionincidencias.entidades.TipoIncidencia;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -34,6 +35,10 @@ public class RepositorioUsuarios {
         } catch (NoResultException ex) {
             return Optional.empty();
         }
+    }
+
+    public Optional<Usuario> buscarID(int id){
+        return Optional.ofNullable(em.find(Usuario.class, id));
     }
 
     public void guardar(Usuario usuario) {

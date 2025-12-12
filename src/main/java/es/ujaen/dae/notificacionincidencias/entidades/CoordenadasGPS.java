@@ -1,5 +1,6 @@
 package es.ujaen.dae.notificacionincidencias.entidades;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,16 +17,17 @@ public class CoordenadasGPS {
 
     public CoordenadasGPS() {}
 
+    @JsonCreator
     public CoordenadasGPS(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
     }
 
-    public double lat() {
+    public double getlat() {
         return lat;
     }
 
-    public double lon() {
+    public double getlon() {
         return lon;
     }
 }
