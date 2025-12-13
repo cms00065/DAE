@@ -35,7 +35,7 @@ public class ServicioSeguridad {
 
                 // Solo un usuario ADMIN o el propio usuario puede ver sus datos
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.GET, "/usuarios/usuario/{email}")
+                        .requestMatchers(HttpMethod.GET, "/usuarios/{email}")
                         .access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or #email == principal"))
 
                         // Solo un usuario ADMIN puede actualizar el estado de una incidencia

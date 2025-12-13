@@ -63,7 +63,7 @@ public class ControladorUsuarios {
         }
     }
 
-    @GetMapping("/usuario/{email}")
+    @GetMapping("/{email}")
     public ResponseEntity<dtoUsuario> obtenerUsuarioPorEmail(@PathVariable String email) {
 
         Optional<Usuario> usuarioOptional = servicioUsuarios.buscarUsuario(email);
