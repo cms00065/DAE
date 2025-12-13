@@ -8,6 +8,7 @@ import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioUsuarios;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,6 +23,9 @@ public class ServicioUsuarios {
     @Autowired
     RepositorioUsuarios usuariosRegistrados;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Optional<Usuario> buscarUsuario(String email) {
         return usuariosRegistrados.buscar(email);
     }
@@ -29,9 +33,17 @@ public class ServicioUsuarios {
     public void registrarUsuario(@Valid Usuario nuevoUsuario) {
 
         Optional<Usuario> existente = usuariosRegistrados.buscar(nuevoUsuario.email());
+
+
+
         if (existente.isPresent()) {
             throw new UsuarioYaRegistrado();
         }
+
+
+        String clavePlana = nuevoUsuario.hashClave();
+        String hashClave  = passwordEncoder.encode(clavePlana);
+        nuevoUsuario.cambiarClave(hashClave);
 
         usuariosRegistrados.guardar(nuevoUsuario);
 
@@ -52,8 +64,8 @@ public class ServicioUsuarios {
 
         Usuario usuario = usuarioOpt.get();
 
-        if (usuario.hashClave().equals(clave)) {
-            return Optional.of(usuario);
+        if (passwordEncoder.matches(clave, usuario.hashClave())) {
+            return Optional.of(usuario); // Clave correcta
         }
 
         return Optional.empty();
