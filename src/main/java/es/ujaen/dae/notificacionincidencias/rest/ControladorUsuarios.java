@@ -6,6 +6,7 @@ import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioYaRegistrado;
 import es.ujaen.dae.notificacionincidencias.rest.dto.MapeadorUsuario;
 import es.ujaen.dae.notificacionincidencias.rest.dto.dtoUsuario;
 import es.ujaen.dae.notificacionincidencias.servicios.ServicioUsuarios;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,12 @@ public class ControladorUsuarios {
             servicioUsuarios.registrarUsuario(mapeadorUsuario.entidadNueva(usuario));
         }
         catch(UsuarioYaRegistrado e) {
+            // Caso 1: Unicidad (El usuario ya existe)
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        catch(ConstraintViolationException e) {
+            // Caso 2: Validación (El teléfono/email no tienen el formato correcto)
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
