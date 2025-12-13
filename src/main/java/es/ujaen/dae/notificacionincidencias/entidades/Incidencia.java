@@ -38,6 +38,10 @@ public class Incidencia {
     @ManyToOne
     private Usuario creador;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] foto;
+
     public Incidencia() {}
 
     public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {
@@ -135,6 +139,14 @@ public class Incidencia {
     public void cambiarEstado(EstadoIncidencia nuevoEstado) {
         this.estado = nuevoEstado;
         this.fechaUltimaActualizacion = LocalDate.now();
+    }
+
+    public byte[] getFoto() {
+        return foto;
+    }
+
+    public void setFoto(byte[] foto) {
+        this.foto = foto;
     }
 }
 

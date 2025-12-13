@@ -65,4 +65,9 @@ public class RepositorioIncidencia {
     public void guardar(Incidencia incidencia) {
         em.persist(incidencia);
     }
+
+    public void actualizarFoto(Incidencia incidencia) {
+        // em.merge() se encarga de actualizar los campos modificados, incluyendo la foto.
+        em.merge(incidencia);
+    }
 }

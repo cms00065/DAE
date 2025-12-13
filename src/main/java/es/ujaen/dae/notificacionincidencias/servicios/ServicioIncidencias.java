@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -66,5 +67,21 @@ public class ServicioIncidencias {
 
         incidencia.cambiarEstado(nuevoEstado);
         repositorioIncidencias.actualizarEstado(incidencia);
+    }
+
+    public void anadirFoto(Usuario actor, Incidencia incidencia, byte[] foto) {
+        Optional<Incidencia> incidenciaExistente = repositorioIncidencias.buscarPorId(incidencia.id());
+        if (incidenciaExistente.isEmpty()) {
+            throw new IncidenciaNoDisponible();
+        }
+
+        if (incidencia.creador().id() != actor.id() && actor.rol() != Rol.ADMIN) {
+            throw new UsuarioNoEsCreador();
+        }
+
+        incidencia.setFoto(foto);
+        incidencia.fechaUltimaActualizacion(LocalDate.now());
+
+        repositorioIncidencias.actualizarFoto(incidencia);
     }
 }
