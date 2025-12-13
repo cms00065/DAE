@@ -3,7 +3,6 @@ package es.ujaen.dae.notificacionincidencias.rest;
 
 import es.ujaen.dae.notificacionincidencias.entidades.Direccion;
 import es.ujaen.dae.notificacionincidencias.entidades.Rol;
-import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.rest.dto.dtoAutenticacionUsuario;
 import es.ujaen.dae.notificacionincidencias.rest.dto.dtoUsuario;
 import jakarta.annotation.PostConstruct;
@@ -17,8 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.springframework.web.bind.annotation.GetMapping;
-
 import java.time.LocalDate;
 
 
@@ -27,7 +24,7 @@ import java.time.LocalDate;
  */
 @SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = {"test"})
-public class TestServicioUsuariosRest {
+public class TestControladorUsuariosRest {
 
     @LocalServerPort
     int localPort;
