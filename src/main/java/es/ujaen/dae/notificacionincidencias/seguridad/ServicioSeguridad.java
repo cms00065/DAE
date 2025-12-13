@@ -31,10 +31,15 @@ public class ServicioSeguridad {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.disable())
                 .addFilterAfter(new FiltroAutenticacionJwt(), UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(httpBasic -> httpBasic.realmName("notificacionincidencias"))
+                //.httpBasic(httpBasic -> httpBasic.realmName("notificacionincidencias"))
+
+                // Solo un usuario ADMIN o el propio usuario puede ver sus datos
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.GET, "/usuarios/usuario/{email}")
+                        .access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or #email == principal"))
+
                         // Solo un usuario ADMIN puede actualizar el estado de una incidencia
-                        .requestMatchers(HttpMethod.POST, "/incidencias/{id}/actualizarEstado").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/incidencias/{id}/actualizarEstado/{nuevoEstado}").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
@@ -46,14 +51,11 @@ public class ServicioSeguridad {
                         .requestMatchers(HttpMethod.GET, "/incidencias/**").authenticated()
 
                         //Cualquier usuario autenticado puede consultar el tipo de incidencia
-                        .requestMatchers(HttpMethod.POST, "/tiposincidencia/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/tiposincidencia/**").authenticated()
 
                         //Solo un usuario ADMIN puede dar de alta o de baja un tipo de incidencia
                         .requestMatchers(HttpMethod.POST, "/tiposincidencia/alta").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/tiposincidencia/baja/**").hasRole("ADMIN")
-
-                        // Solo un usuario ADMIN o el propio usuario puede ver sus datos
-                        .requestMatchers(HttpMethod.GET, "/usuarios/{email}").access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or #id == principal.username"))
 
                         .anyRequest().authenticated()
                 )
