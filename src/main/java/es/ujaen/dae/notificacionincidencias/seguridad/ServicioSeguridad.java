@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class ServicioSeguridad {
@@ -29,10 +30,13 @@ public class ServicioSeguridad {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.disable())
+                .addFilterAfter(new FiltroAutenticacionJwt(), UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(httpBasic -> httpBasic.realmName("notificacionincidencias"))
                 .authorizeHttpRequests(request -> request
                         // Solo un usuario ADMIN puede actualizar el estado de una incidencia
                         .requestMatchers(HttpMethod.POST, "/incidencias/{id}/actualizarEstado").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
                         // Todos los usuarios pueden crear incidencias
                         .requestMatchers(HttpMethod.POST, "/incidencias").hasAnyRole("ADMIN", "CIUDADANO")
