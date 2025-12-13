@@ -1,6 +1,7 @@
 package es.ujaen.dae.notificacionincidencias.seguridad;
 
 
+import es.ujaen.dae.notificacionincidencias.entidades.Rol;
 import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.servicios.ServicioUsuarios;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class ServicioCredencialesUsuario implements UserDetailsService {
 
         return User.withUsername(usuario.email())
                 .password(usuario.hashClave())
-                .roles(usuario.nombre().equals("admin") ? "ADMIN": "CIUDADANO")
+                .roles(usuario.rol().equals(Rol.ADMIN) ? "ADMIN": "CIUDADANO")
                 .build();
     }
 }
