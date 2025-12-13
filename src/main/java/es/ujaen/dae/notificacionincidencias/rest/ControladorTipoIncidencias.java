@@ -114,7 +114,7 @@ public class ControladorTipoIncidencias {
 
             //Se da de baja el tipo de incidencia por el usuario
             servicioTipoIncidencia.baja(usuario, id, incidencias);
-            return ResponseEntity.ok("Tipo de incidencia desactivado correctamente");
+            return ResponseEntity.ok().build();
         }catch (UsuarioNoEsAdmin e){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }catch (TipoIncidenciaEstaEnUso e){
