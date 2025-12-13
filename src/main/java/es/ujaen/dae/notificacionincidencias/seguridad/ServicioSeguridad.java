@@ -38,15 +38,22 @@ public class ServicioSeguridad {
 
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/autenticacion").permitAll()
 
                         // Todos los usuarios pueden crear incidencias
                         .requestMatchers(HttpMethod.POST, "/incidencias").hasAnyRole("ADMIN", "CIUDADANO")
 
                         .requestMatchers(HttpMethod.GET, "/incidencias/**").authenticated()
 
+                        //Cualquier usuario autenticado puede consultar el tipo de incidencia
+                        .requestMatchers(HttpMethod.POST, "/tiposincidencia/**").authenticated()
+
+                        //Solo un usuario ADMIN puede dar de alta o de baja un tipo de incidencia
+                        .requestMatchers(HttpMethod.POST, "/tiposincidencia/alta").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/tiposincidencia/baja/**").hasRole("ADMIN")
+
                         // Solo un usuario ADMIN o el propio usuario puede ver sus datos
-                        .requestMatchers(HttpMethod.GET, "/usuarios/{id}").access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or #id == principal.username"))
+                        .requestMatchers(HttpMethod.GET, "/usuarios/{email}").access(new WebExpressionAuthorizationManager("hasRole('ADMIN') or #id == principal.username"))
 
                         .anyRequest().authenticated()
                 )
