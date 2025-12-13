@@ -57,7 +57,7 @@ public class ControladorIncidencias {
 
     }
 
-    @PostMapping("/incidencias/{id}/actualizarEstado/{nuevoEstado}")
+    @PostMapping("/{id}/actualizarEstado/{nuevoEstado}")
     public ResponseEntity<dtoIncidencia> actualizarEstado(@PathVariable int id,
                                                           @PathVariable EstadoIncidencia nuevoEstado,
                                                           @RequestBody dtoUsuario dUsuario) {
