@@ -38,6 +38,8 @@ public class ServicioSeguridad {
 
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
+                        .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
+
                         // Todos los usuarios pueden crear incidencias
                         .requestMatchers(HttpMethod.POST, "/incidencias").hasAnyRole("ADMIN", "CIUDADANO")
 
