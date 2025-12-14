@@ -2,6 +2,7 @@ package es.ujaen.dae.notificacionincidencias.servicios;
 
 import es.ujaen.dae.notificacionincidencias.entidades.*;
 import es.ujaen.dae.notificacionincidencias.excepciones.*;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -159,5 +160,149 @@ public class TestServicioIncidencias {
 
         var resultado = servicioIncidencias.buscarIncidenciasCreadasPor(usuario);
         assertThat(resultado).isEmpty();
+    }
+
+    /**
+     * Buscar incidencias cercanas (<=10m) con estados válidos
+     */
+    @Test
+    @DirtiesContext
+    void testIncidenciasMenorIgualDiezMetros(){
+        // ---------- Datos básicos ----------
+        Direccion dir = new Direccion("C/ Real", "1", "2A", "Jaén", "23001");
+        var admin = new Usuario("Admin", "Uno", null, dir, "600000001", "admin@ujaen.es", "admin", "clave", Rol.ADMIN);
+        var usuario = new Usuario("Pedro", "Cliente", null, dir, "600000002", "pedro@ujaen.es", "pedro", "clave", Rol.CIUDADANO);
+
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+
+        var tipo = new TipoIncidencia(0, "Alumbrado", "Farola fundida", true, null);
+        servicioTipoIncidencia.alta(admin, tipo);
+
+        // ---------- Incidencia base ----------
+        var base = new Incidencia(
+                LocalDate.now(),
+                "Incidencia base",
+                "C/ Uno",
+                EstadoIncidencia.PENDIENTE,
+                new CoordenadasGPS(37.000000, -3.000000),
+                tipo,
+                usuario
+        );
+        servicioIncidencias.crearIncidencia(base);
+
+        // ---------- Incidencia cercana (< 10 m) ----------
+        var cercana = new Incidencia(
+                LocalDate.now(),
+                "Cerca de base",
+                "C/ Dos",
+                EstadoIncidencia.PENDIENTE,
+                new CoordenadasGPS(37.000050, -3.000050), // Diferencia muy pequeña
+                tipo,
+                usuario
+        );
+        servicioIncidencias.crearIncidencia(cercana);
+
+        // ---------- TEST ----------
+        var resultado = servicioIncidencias.buscarIncidenciasCercanasPendientesOEnTramite(new CoordenadasGPS(37.000000, -3.000000));
+
+        assertThat(resultado)
+                .extracting(Incidencia::descripcion)
+                .contains("Cerca de base");
+    }
+
+    /**
+     * Incidencia fuera de rango (>10m) no debe aparecer
+     */
+    @Test
+    @DirtiesContext
+    void testIncidenciasCercanasFueraDeDiezMetros() {
+
+        Direccion dir = new Direccion("C/ Real", "1", "2A", "Jaén", "23001");
+        var admin = new Usuario("Admin", "Uno", null, dir, "600000001", "admin@ujaen.es", "admin", "clave", Rol.ADMIN);
+        var usuario = new Usuario("Lucia", "Cliente", null, dir, "600000003", "lucia@ujaen.es", "lucia", "clave", Rol.CIUDADANO);
+
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+
+        var tipo = new TipoIncidencia(0, "Basuras", "Contenedor", true, null);
+        servicioTipoIncidencia.alta(admin, tipo);
+
+        //Incidencia base
+        var base = new Incidencia(
+                LocalDate.now(),
+                "Base",
+                "C/ Principal",
+                EstadoIncidencia.PENDIENTE,
+                new CoordenadasGPS(37.000000, -3.000000),
+                tipo,
+                usuario
+        );
+        servicioIncidencias.crearIncidencia(base);
+
+        // A unos 100 metros aprox.
+        var lejana = new Incidencia(
+                LocalDate.now(),
+                "Lejana",
+                "C/ Secundaria",
+                EstadoIncidencia.PENDIENTE,
+                new CoordenadasGPS(37.000900, -3.000900),
+                tipo,
+                usuario
+        );
+        servicioIncidencias.crearIncidencia(lejana);
+
+        var resultado = servicioIncidencias.buscarIncidenciasCercanasPendientesOEnTramite(new CoordenadasGPS(37.000000, -3.000000));
+
+        assertThat(resultado)
+                .extracting(Incidencia::descripcion)
+                .doesNotContain("Lejana");
+    }
+
+    /**
+     * Incidencias cercanas pero en estado no válido (RESUELTA)
+     */
+    @Test
+    @DirtiesContext
+    void testIncidenciasCercanasEstadoNoValido() {
+
+        Direccion dir = new Direccion("C/ Real", "1", "2A", "Jaén", "23001");
+        var admin = new Usuario("Admin", "Uno", null, dir, "600000001", "admin@ujaen.es", "admin", "clave", Rol.ADMIN);
+        var usuario = new Usuario("Maria", "User", null, dir, "600000004", "maria@ujaen.es", "maria", "clave", Rol.CIUDADANO);
+
+        servicioUsuarios.registrarUsuario(admin);
+        servicioUsuarios.registrarUsuario(usuario);
+
+        var tipo = new TipoIncidencia(0, "Obras", "Zanja", true, null);
+        servicioTipoIncidencia.alta(admin, tipo);
+
+        var base = new Incidencia(
+                LocalDate.now(),
+                "Base",
+                "C/ Uno",
+                EstadoIncidencia.PENDIENTE,
+                new CoordenadasGPS(37.002000, -3.002000),
+                tipo,
+                usuario
+        );
+        servicioIncidencias.crearIncidencia(base);
+
+        // Muy cerca, pero en estado RESUELTA debe ignorarse
+        var resuelta = new Incidencia(
+                LocalDate.now(),
+                "Resuelta cerca",
+                "C/ Dos",
+                EstadoIncidencia.RESUELTA,
+                new CoordenadasGPS(37.002005, -3.002005),
+                tipo,
+                usuario
+        );
+        servicioIncidencias.crearIncidencia(resuelta);
+
+        var resultado = servicioIncidencias.buscarIncidenciasCercanasPendientesOEnTramite(new CoordenadasGPS(37.002000, -3.002000));
+
+        assertThat(resultado)
+                .extracting(Incidencia::descripcion)
+                .doesNotContain("Resuelta cerca");
     }
 }
