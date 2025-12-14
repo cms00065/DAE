@@ -10,10 +10,10 @@ import jakarta.validation.constraints.NotNull;
 @Embeddable
 public class CoordenadasGPS {
     @NotNull
-    double lat;
+    private double lat;
 
     @NotNull
-    double lon;
+    private double lon;
 
     public CoordenadasGPS() {}
 
