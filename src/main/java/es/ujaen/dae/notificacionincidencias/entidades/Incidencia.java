@@ -55,6 +55,18 @@ public class Incidencia {
         this.creador = creador;
     }
 
+    public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador, byte[] foto) {
+        this.fecha = fecha;
+        this.fechaUltimaActualizacion = fecha;
+        this.descripcion = descripcion;
+        this.localizacion = localizacion;
+        this.estado = estado;
+        this.ubicacionGPS = ubicacionGPS;
+        this.tipo = tipo;
+        this.creador = creador;
+        this.foto = foto;
+    }
+
     public int id() {
         return id;
     }
@@ -141,11 +153,11 @@ public class Incidencia {
         this.fechaUltimaActualizacion = LocalDate.now();
     }
 
-    public byte[] getFoto() {
+    public byte[] foto() {
         return foto;
     }
 
-    public void setFoto(byte[] foto) {
+    public void foto(byte[] foto) {
         this.foto = foto;
     }
 }

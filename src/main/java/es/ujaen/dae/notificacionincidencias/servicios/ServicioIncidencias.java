@@ -7,7 +7,6 @@ import es.ujaen.dae.notificacionincidencias.util.UtilGeodesia;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
@@ -83,7 +82,7 @@ public class ServicioIncidencias {
             throw new UsuarioNoEsCreador();
         }
 
-        incidencia.setFoto(foto);
+        incidencia.foto(foto);
         incidencia.fechaUltimaActualizacion(LocalDate.now());
 
         repositorioIncidencias.actualizarFoto(incidencia);

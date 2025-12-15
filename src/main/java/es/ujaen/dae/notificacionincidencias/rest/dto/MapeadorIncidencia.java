@@ -4,7 +4,6 @@ import es.ujaen.dae.notificacionincidencias.entidades.Incidencia;
 import es.ujaen.dae.notificacionincidencias.entidades.TipoIncidencia;
 import es.ujaen.dae.notificacionincidencias.entidades.Usuario;
 import es.ujaen.dae.notificacionincidencias.excepciones.UsuarioNoDisponible;
-import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioIncidencia;
 import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioTipoIncidencia;
 import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,8 @@ public class MapeadorIncidencia {
                 incidencia.estado(),
                 incidencia.ubicacionGPS(),
                 Integer.toString(incidencia.tipo().id()),
-                Integer.toString(incidencia.creador().id())
+                Integer.toString(incidencia.creador().id()),
+                incidencia.foto()
         );
     }
 
@@ -48,7 +48,8 @@ public class MapeadorIncidencia {
                 dtoIncidencia.estado(),
                 dtoIncidencia.ubicacionGPS(),
                 tipo,
-                usuario
+                usuario,
+                dtoIncidencia.foto()
         );
     }
 }

@@ -18,7 +18,8 @@ public record dtoIncidencia(int id,
                             EstadoIncidencia estado,
                             CoordenadasGPS ubicacionGPS,
                             String IDtipoIncidencia,
-                            String IDcreador) {
+                            String IDcreador,
+                            byte[] foto) {
 
 
 }
