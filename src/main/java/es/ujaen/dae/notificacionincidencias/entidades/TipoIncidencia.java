@@ -40,6 +40,13 @@ public class TipoIncidencia {
         this.fechaAlta = fechaAlta;
     }
 
+    public TipoIncidencia(String nombre, String descripcion, boolean activo, LocalDateTime fechaAlta) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.activo = activo;
+        this.fechaAlta = fechaAlta;
+    }
+
     //Getters y setters
     public int id() {
         return id;

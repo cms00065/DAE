@@ -38,6 +38,13 @@ public class Incidencia {
     @ManyToOne
     private Usuario creador;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] foto;
+
+    @Version
+    int version;
+
     public Incidencia() {}
 
     public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {
@@ -49,6 +56,18 @@ public class Incidencia {
         this.ubicacionGPS = ubicacionGPS;
         this.tipo = tipo;
         this.creador = creador;
+    }
+
+    public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador, byte[] foto) {
+        this.fecha = fecha;
+        this.fechaUltimaActualizacion = fecha;
+        this.descripcion = descripcion;
+        this.localizacion = localizacion;
+        this.estado = estado;
+        this.ubicacionGPS = ubicacionGPS;
+        this.tipo = tipo;
+        this.creador = creador;
+        this.foto = foto;
     }
 
     public int id() {
@@ -74,6 +93,8 @@ public class Incidencia {
     public LocalDate fechaUltimaActualizacion() {
         return fechaUltimaActualizacion;
     }
+
+    public CoordenadasGPS ubicacionGPS() {return ubicacionGPS;}
 
     public TipoIncidencia tipo() {
         return tipo;
@@ -133,6 +154,14 @@ public class Incidencia {
     public void cambiarEstado(EstadoIncidencia nuevoEstado) {
         this.estado = nuevoEstado;
         this.fechaUltimaActualizacion = LocalDate.now();
+    }
+
+    public byte[] foto() {
+        return foto;
+    }
+
+    public void foto(byte[] foto) {
+        this.foto = foto;
     }
 }
 

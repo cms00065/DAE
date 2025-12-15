@@ -47,10 +47,16 @@ public class RepositorioIncidencia {
                 .setParameter("usuario", creador)
                 .getResultList();
     }
+    
+    @Transactional(readOnly = true)
+    public List<Incidencia> listarTodas(){
+        return em.createQuery("SELECT i FROM Incidencia i", Incidencia.class).getResultList();
+    }
 
     public void eliminar(Incidencia incidencia) {
         Incidencia gestionada = em.merge(incidencia);
         em.remove(gestionada);
+        em.flush();
     }
 
     public void actualizarEstado(Incidencia incidencia) {
@@ -59,5 +65,10 @@ public class RepositorioIncidencia {
 
     public void guardar(Incidencia incidencia) {
         em.persist(incidencia);
+    }
+
+    public void actualizarFoto(Incidencia incidencia) {
+        // em.merge() se encarga de actualizar los campos modificados, incluyendo la foto.
+        em.merge(incidencia);
     }
 }
