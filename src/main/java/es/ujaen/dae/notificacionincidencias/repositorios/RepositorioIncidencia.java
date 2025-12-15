@@ -56,6 +56,7 @@ public class RepositorioIncidencia {
     public void eliminar(Incidencia incidencia) {
         Incidencia gestionada = em.merge(incidencia);
         em.remove(gestionada);
+        em.flush();
     }
 
     public void actualizarEstado(Incidencia incidencia) {

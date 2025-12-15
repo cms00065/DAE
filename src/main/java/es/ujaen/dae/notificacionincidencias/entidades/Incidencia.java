@@ -42,6 +42,9 @@ public class Incidencia {
     @Basic(fetch = FetchType.LAZY)
     private byte[] foto;
 
+    @Version
+    int version;
+
     public Incidencia() {}
 
     public Incidencia(LocalDate fecha, String descripcion, String localizacion, EstadoIncidencia estado, CoordenadasGPS ubicacionGPS, TipoIncidencia tipo, Usuario creador) {

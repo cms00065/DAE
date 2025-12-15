@@ -4,8 +4,10 @@ import es.ujaen.dae.notificacionincidencias.entidades.*;
 import es.ujaen.dae.notificacionincidencias.excepciones.*;
 import es.ujaen.dae.notificacionincidencias.repositorios.RepositorioIncidencia;
 import es.ujaen.dae.notificacionincidencias.util.UtilGeodesia;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -48,28 +50,54 @@ public class ServicioIncidencias {
         return repositorioIncidencias.buscarPorEstado(estado);
     }
 
+
+    @Transactional
     public void borrar(Usuario actor, Incidencia incidencia) {
-        if (incidencia.puedeBorrar(actor)) {
-            repositorioIncidencias.eliminar(incidencia);
+        // 1. Recuperar la incidencia GESTIONADA para asegurar su existencia y su estado actual
+        Optional<Incidencia> optIncidencia = repositorioIncidencias.buscarPorId(incidencia.id());
+
+        // Si no existe (entidad perdida/borrada justo antes de mí), lanzamos excepción
+        Incidencia incidenciaGestionada = optIncidencia.orElseThrow(
+                () -> new IncidenciaNoDisponible()
+        );
+
+        if (incidenciaGestionada.puedeBorrar(actor)) {
+
+            try {
+                // Utilizamos la entidad gestionada que obtuvimos en el paso 1
+                repositorioIncidencias.eliminar(incidenciaGestionada);
+
+            } catch (OptimisticLockingFailureException e) {
+                throw new IncidenciaNoDisponible();
+            } catch (Exception e) {
+                throw new IncidenciaNoDisponible();
+            }
         }
     }
 
-    public List<Incidencia> listarTodas(){
+    public List<Incidencia> listarTodas() {
         return repositorioIncidencias.listarTodas();
     }
 
-    public void cambiarEstado(Usuario actor, Incidencia incidencia, EstadoIncidencia nuevoEstado) {
+    @Transactional
+    public void cambiarEstado(Usuario actor, Incidencia incidenciaParaActualizar, EstadoIncidencia nuevoEstado) {
         if (actor.rol() != Rol.ADMIN) {
             throw new UsuarioNoEsAdmin();
         }
 
-        Optional<Incidencia> incidenciaExistente = repositorioIncidencias.buscarPorId(incidencia.id());
-        if (incidenciaExistente.isEmpty()) {
-            throw new IncidenciaNoDisponible();
-        }
+        try {
+            Optional<Incidencia> incidenciaExistente = repositorioIncidencias.buscarPorId(incidenciaParaActualizar.id());
 
-        incidencia.cambiarEstado(nuevoEstado);
-        repositorioIncidencias.actualizarEstado(incidencia);
+            Incidencia incidenciaGestionada = incidenciaExistente.orElseThrow(
+                    () -> new IncidenciaNoDisponible()
+            );
+
+            incidenciaGestionada.cambiarEstado(nuevoEstado);
+
+            repositorioIncidencias.actualizarEstado(incidenciaGestionada);
+
+        } catch (OptimisticLockingFailureException e) {
+        }
     }
 
     public void anadirFoto(Usuario actor, Incidencia incidencia, byte[] foto) {
