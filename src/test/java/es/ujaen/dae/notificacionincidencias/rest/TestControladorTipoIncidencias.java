@@ -24,7 +24,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles(profiles = {"test"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TestControladorTipoIncidencias {
@@ -48,7 +48,7 @@ public class TestControladorTipoIncidencias {
     @PostConstruct
     void crearRestTemplateBuilder() {
         var restTemplateBuilder = new RestTemplateBuilder()
-                .rootUri("http://localhost:" + localPort);
+                .rootUri("https://localhost:" + localPort);
 
         restTemplate = new TestRestTemplate(restTemplateBuilder);
     }

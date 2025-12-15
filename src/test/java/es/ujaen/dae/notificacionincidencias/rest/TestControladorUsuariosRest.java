@@ -22,7 +22,7 @@ import java.time.LocalDate;
 /**
  * @author gcg00035
  */
-@SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = es.ujaen.dae.notificacionincidencias.app.NotificacionIncidencias.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles(profiles = {"test"})
 public class TestControladorUsuariosRest {
 
@@ -43,7 +43,7 @@ public class TestControladorUsuariosRest {
     @PostConstruct
     void crearRestTemplateBuilder() {
         var restTemplateBuilder = new RestTemplateBuilder()
-                .rootUri("http://localhost:" + localPort);
+                .rootUri("https://localhost:" + localPort);
 
         restTemplate = new TestRestTemplate(restTemplateBuilder);
     }
