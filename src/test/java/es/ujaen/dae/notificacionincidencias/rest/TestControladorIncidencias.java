@@ -349,8 +349,16 @@ public class TestControladorIncidencias {
                 dtoIncidencia.class
         );
 
+        var respuestaGet = restTemplate.exchange(
+                RequestEntity
+                        .get("/incidencias/1")
+                        .headers(headerAutorizacion(tokenCiudadano))
+                        .build(),
+                dtoIncidencia.class
+        );
+
         assertThat(respuestaCambioEstadoAdmin.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(respuestaCambioEstadoAdmin.getBody().estado()).isEqualTo(EstadoIncidencia.EN_EVALUACION);
+        assertThat(respuestaGet.getBody().estado()).isEqualTo(EstadoIncidencia.EN_EVALUACION);
 
         assertThat(respuestaCambioEstadoFail.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
